@@ -1,0 +1,54 @@
+---
+title: "How Squished Are Your DGGS Cells?"
+subtitle: "A Spherical Aspect Ratio"
+author: "AJ Friend"
+format:
+  revealjs:
+    html-math-method: mathjax  # https://github.com/quarto-dev/quarto-cli/discussions/3127
+    css: style.css
+    output-file: index.html
+    include-in-header:
+      text: |
+        <script>
+        window.MathJax = {
+          tex: {
+            macros: {
+              R: '\\mathbf{R}',
+              Sph: '\\mathbb{S}',
+              Sym: '\\mathbf{S}',
+              norm: ['\\left\\lVert #1 \\right\\rVert', 1]
+            }
+          }
+        };
+        </script>
+---
+
+## What we'll cover
+
+- Many DGGSs: how do we compare them?
+- Area variation is the usual axis. Shape distortion is the other.
+- Squished H3 hexagons, and why squish matters computationally
+- A spherical aspect ratio: the tightest enclosing ellipsoidal cone
+- A convex problem, solved exactly, microseconds per cell
+- Survey: H3, S2, A5, ISEA7H, IVEA7H, rHEALPix
+- Generalizing to the ellipsoid
+
+## The primal problem
+
+Data: $n$ points $x_1, \ldots, x_n$ on the unit sphere $\Sph^2 \subset \R^3$.
+
+$$
+\begin{array}{ll}
+\text{minimize}   & -\log\det A \\[4pt]
+\text{subject to} & \norm{A x_i}_2 \le b^\top x_i, \quad i = 1, \ldots, n \\[4pt]
+                  & \norm{b}_2 \le 1
+\end{array}
+$$
+
+with variables $A \in \Sym^3_{++}$ and $b \in \R^3$.
+
+. . .
+
+- Each constraint is a second-order cone in $(A, b)$: jointly convex in shape and axis.
+- The enclosing cone is $\mathcal{C}(A, b) = \{\, x : \norm{A x}_2 \le b^\top x \,\}$.
+- Aspect ratio $= a / b$, the semi-axis ratio of the cone's elliptical cross section.
