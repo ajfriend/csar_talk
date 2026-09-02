@@ -1,7 +1,9 @@
 ---
-title: "How Squished Are Your DGGS Cells?"
+title: "How *Squished* Are Your DGGS Cells?"
 subtitle: "A Spherical Aspect Ratio"
-author: "AJ Friend"
+author:
+  - name: AJ Friend
+    affiliation: Waymo Data Science
 format:
   revealjs:
     html-math-method: mathjax  # https://github.com/quarto-dev/quarto-cli/discussions/3127
@@ -20,22 +22,20 @@ format:
 - Survey: H3, S2, A5, ISEA7H, IVEA7H, rHEALPix
 - Generalizing to the ellipsoid
 
-## The primal problem
+## Tightest Enclosing Ellipsoidal Cone
 
-Data: $n$ points $x_1, \ldots, x_n$ on the unit sphere $\Sph^2 \subset \R^3$.
 
 $$
 \begin{array}{ll}
-\underset{A,\, b}{\text{minimize}} & -\logdet A \\[4pt]
-\text{subject to} & \norm{A x_i}_2 \le b^\top x_i, \quad i = 1, \ldots, n \\[4pt]
-                  & \norm{b}_2 \le 1
+\underset{A,\, b}{\text{minimize}}
+& -\logdet A \\
+\text{subject to}
+& \norm{A x_i}_2 \le b^\top x_i, \quad i = 1, \ldots, n \\
+& \norm{b}_2 \le 1
 \end{array}
 $$
 
-where $A \in \Sym^3_{++}$ and $b \in \R^3$.
+with
 
-. . .
-
-- Each constraint is a second-order cone in $(A, b)$: jointly convex in shape and axis.
-- The enclosing cone is $\mathcal{C}(A, b) = \{\, x : \norm{A x}_2 \le b^\top x \,\}$.
-- Aspect ratio $= a / b$, the semi-axis ratio of the cone's elliptical cross section.
+- data: $x_1, \ldots, x_n \in \R^3$ (on the sphere)
+- variables: $A \in \Sym^3_{++}$ and $b \in \R^3$
