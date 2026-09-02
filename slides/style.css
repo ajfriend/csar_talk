@@ -11,12 +11,8 @@
   max-height: none !important;
 }
 
-/* Interactive stage under a slide heading (1050x600 of the 1050x700 slide) */
+/* Interactive stage under a slide heading; reveal's r-stretch sets the height */
 .stage {
-  position: absolute;
-  left: 0;
-  top: 100px;
+  display: block;
   width: 100%;
-  height: 600px;
-  max-width: none !important;
 }

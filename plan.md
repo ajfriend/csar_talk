@@ -126,9 +126,8 @@ that shows each system's real spread:
 - S2 level 3 (~12° cells): AR 1.009 to 1.548. L2 gives 1.04-1.39 at 23°;
   L5+ settles at ~1.68. Round: 0fc0000000000000. Squished: 2ac0000000000000.
 
-Each gets a slide: points + spherical ellipse, looking down the axis,
-camera distance computed so the cell fills about half the stage
-(needs csar_viz's close-zoom camera floor of 1.02).
+Each gets a slide (slides/web/cellslide.js mounts every `canvas[data-cell]`);
+the camera closes in on cells this small, so csar_viz's distance floor is 1.02.
 
 ## Talk skeleton (draft, tune to 25 min)
 

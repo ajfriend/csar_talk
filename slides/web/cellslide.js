@@ -1,14 +1,17 @@
-// A per-cell slide: the cell's vertices and the spherical ellipse through
-// them, looked at straight down the cone's axis. Cells come from
-// data/cells.js (scripts/make_cell_examples.py).
+// Mounts every <canvas data-cell="…"> in the deck with that cell from
+// data/cells.js (scripts/make_cell_examples.py): the cell's vertices and
+// the spherical ellipse through them, looked at straight down the cone's
+// axis, sized to fill about half the stage. Also the deck's one import of
+// teec.js, so the cone slide takes `mount` from here.
 import { mount } from 'https://ajfriend.com/csar_viz/teec.js';
-import { byKey } from '../data/cells.js';
+import { cells } from '../data/cells.js';
 
-export function mountCell(canvasId, key) {
-  const cell = byKey[key];
-  return mount(document.getElementById(canvasId), {
-    points: cell.points,
-    view: { center: 'axis', dist: cell.dist },
+export { mount };
+
+for (const cv of document.querySelectorAll('canvas[data-cell]')) {
+  mount(cv, {
+    points: cells[cv.dataset.cell].points,
+    view: { center: 'axis', fit: 0.45 },
     show: { cone: false, axis: false, hull: true },
     interaction: { edit: false },
   });

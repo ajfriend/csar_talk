@@ -10,6 +10,7 @@ format:
     css: style.css
     output-file: index.html
     include-in-header: mathjax-macros.html
+    include-after-body: cellslides.html
 ---
 
 ## What we'll cover
@@ -44,7 +45,7 @@ with
 ```{=html}
 <canvas id="cone" class="fullscreen" aria-label="Tightest enclosing ellipsoidal cone, interactive"></canvas>
 <script type="module">
-  import { mount } from 'https://ajfriend.com/csar_viz/teec.js';
+  import { mount } from './web/cellslide.js';
   mount(document.getElementById('cone'), {
     points: [[-20, 40], [-5, 48], [10, 50], [25, 46], [35, 38], [20, 30], [5, 28], [-10, 31]],
     view: { center: 'axis', dist: 2.7 },
@@ -55,40 +56,24 @@ with
 ## H3, resolution 2: a round cell
 
 ```{=html}
-<canvas id="h3-low" class="stage"></canvas>
-<script type="module">
-  import { mountCell } from './web/cellslide.js';
-  mountCell('h3-low', 'h3-low');
-</script>
+<canvas class="r-stretch stage" data-cell="h3-low"></canvas>
 ```
 
 ## H3, resolution 2: a squished cell
 
 ```{=html}
-<canvas id="h3-high" class="stage"></canvas>
-<script type="module">
-  import { mountCell } from './web/cellslide.js';
-  mountCell('h3-high', 'h3-high');
-</script>
+<canvas class="r-stretch stage" data-cell="h3-high"></canvas>
 ```
 
 ## S2, level 3: a round cell
 
 ```{=html}
-<canvas id="s2-low" class="stage"></canvas>
-<script type="module">
-  import { mountCell } from './web/cellslide.js';
-  mountCell('s2-low', 's2-low');
-</script>
+<canvas class="r-stretch stage" data-cell="s2-low"></canvas>
 ```
 
 ## S2, level 3: a squished cell
 
 ```{=html}
-<canvas id="s2-high" class="stage"></canvas>
-<script type="module">
-  import { mountCell } from './web/cellslide.js';
-  mountCell('s2-high', 's2-high');
-</script>
+<canvas class="r-stretch stage" data-cell="s2-high"></canvas>
 ```
 
