@@ -1,0 +1,6 @@
+slides/_site/
+scripts/raw/
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+.DS_Store

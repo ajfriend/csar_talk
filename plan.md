@@ -1,0 +1,160 @@
+# Plan: FOSS4G NA 2026 talk on spherical aspect ratio (csar)
+
+Talk: "How Squished Are Your DGGS Cells? A Spherical Aspect Ratio"
+Slot: 25 minutes. Proposal text: `../proposals/ar.md`. Must mention H3.
+
+## Decisions
+
+- **Quarto + reveal.js**, authored in markdown (`talk.qmd`). Same stack as
+  `~/work/h3c2p_talk_prep`, which already proved out iframed interactive
+  HTML, fullscreen embeds, and a publish step.
+- **No executed code cells.** Quarto renders markdown only. Every figure,
+  table, and data file is prerendered by scripts under `scripts/` and driven
+  by the `justfile`. The deck references static outputs in `slides/figs/`
+  and globe data in `slides/data/`.
+- **`uv` + `justfile`** manage the Python environment and every task
+  (render, figs, serve, publish). No bare python; PEP 723 or `pyproject.toml`
+  for deps.
+- **Interactive globes via ajglobe**, loaded from jsDelivr pinned to a
+  commit or tag (not vendored; not raw.githubusercontent.com, which serves
+  text/plain and breaks ES modules). Switch to the npm path once ajglobe
+  is published. Reuse `~/work/dggs_compare/web/globe.js` as the starting
+  point: it already draws per-cell AR heatmaps from the Parquet tables.
+  Globe pages live in `slides/web/` and read `slides/data/`.
+- **csar_viz only for the cone plot**, iframed from its own GitHub Pages
+  deployment (to be enabled in that repo; tag it before the talk).
+  Optionally `playground.html` for the 2D C(A, b) intuition slide.
+- **No vendoring by default.** A `just vendor` target exists as a day-of
+  safety net: it snapshots ajglobe and csar_viz into the local render
+  output for offline presenting on conference wifi.
+- **One repo, published to GitHub Pages by a GitHub Actions workflow**
+  on push to main. Render output is never committed. This replaces the
+  prep-repo + rendered-repo pair used for h3c2p. The workflow only needs
+  Quarto (`quarto-dev/quarto-actions/setup`) plus
+  `actions/upload-pages-artifact` and `actions/deploy-pages`, since every
+  figure is prerendered and committed under `slides/figs/`. No Python in CI.
+- **Web slides are the primary artifact.** Export a PDF handout afterward
+  as a fallback only.
+
+## Layout
+
+Two top-level folders, plus the justfile and this plan.
+
+```
+csar_talk/
+  plan.md
+  justfile                 every task; run from the repo root
+  scripts/                 all Python: figure + data scripts, no CLI args
+    pyproject.toml         deps (csar, sparea, h3, pyarrow, matplotlib, ...)
+    uv.lock
+    make_*.py              one script per figure or data product
+    raw/                   downloaded dggs_compare Parquet releases, gitignored
+  slides/                  a self-contained Quarto project
+    _quarto.yml            output-dir: _site
+    talk.qmd               the deck (markdown only)
+    style.css
+    web/                   talk-owned globe pages, one per globe slide;
+                           each imports ajglobe from the CDN and loads data/
+    figs/                  prerendered PNG/SVG outputs, written by scripts,
+                           committed
+    data/                  per-globe AR data (JSON or quantized binary),
+                           written by scripts, committed
+    _site/                 render output, gitignored
+  .github/workflows/pages.yml   render slides/ with Quarto, deploy to Pages
+```
+
+`talk.qmd` lives in `slides/` rather than the top level because Quarto
+resolves images, iframes, and CSS relative to the document, and the Pages
+workflow renders and uploads one directory.
+
+## Justfile targets
+
+All run from the repo root; Python targets `cd scripts` and use `uv run`.
+
+- `render`: `quarto render slides`
+- `serve`: `uv run -m http.server` on `slides/_site/` (ES modules + wasm
+  need http)
+- `data`: fetch dggs_compare Parquet releases into `scripts/raw/`
+- `figs`: run every `scripts/make_*.py`; static plots to `slides/figs/`,
+  globe data to `slides/data/`
+- `vendor`: optional, day-of only: snapshot ajglobe and csar_viz into
+  `slides/_site/` and rewrite the links, so the deck runs offline
+- `pdf`: reveal.js print-to-PDF via decktape or Chrome, for the handout
+- `publish`: just `git push`; the Pages workflow renders and deploys
+- `clean` / `purge`
+
+## Figure and demo inventory
+
+Static (scripts -> slides/figs/):
+
+1. Squished H3 hexagons, a few resolutions and locations. The visual hook.
+2. Why shape matters: neighbor distances, gradient stencil, convolution
+   kernel on a squished vs round cell.
+3. Enclosing-ellipse-on-sphere diagram: points on sphere, the cone, the
+   ellipse cross section, major/minor axes.
+4. AR histograms across H3, S2, A5, ISEA7H, IVEA7H, rHEALPix at area-matched
+   resolutions (from dggs_compare `out/histograms.png` or regenerated).
+5. AR vs resolution per system (`by_res_*.png`).
+6. AR vs IPQ scatter, and the "kink cells" that show where IPQ and AR
+   disagree.
+7. Summary table of per-system stats.
+8. Ellipsoid generalization sketch for the closing (from
+   `csar_all/skar_notes/ellipsoid_sphere_distortion_and_transforms.md`).
+
+Interactive (web/ -> iframed):
+
+- G1. AR heatmap globe, one per DGGS, switchable. ajglobe. Precomputed AR
+  per cell shipped as data. No live solving.
+- G2. Side-by-side globes for two systems at matched resolution.
+- C1. Cone demo: click points on the sphere, watch the enclosing cone and
+  ellipse update. Iframe of the csar_viz Pages site. Small point sets only.
+- C2 (optional). 2D playground for C(A, b), if the math slide needs it.
+
+## Talk skeleton (draft, tune to 25 min)
+
+1. About me, H3 background. (1 min)
+2. Many DGGSs, how to compare. Area variation is the usual axis. (2 min)
+3. The other axis: shape. Squished H3 hexes. G1 hook. (3 min)
+4. Why it matters computationally. (2 min)
+5. Existing shape metrics and where they fall short: IPQ, chart-based AR,
+   Tissot. (2 min)
+6. Definition: tightest enclosing ellipsoidal cone, AR = a/b. C1 demo. (5 min)
+7. It's a convex problem, solved exactly with a certificate, microseconds
+   per cell. Brief, one or two slides. (2 min)
+8. Survey: histograms, by resolution, globes for each system. (5 min)
+9. AR vs IPQ. (1 min)
+10. Ellipsoids, WGS84, what's next. Package name, links. (2 min)
+
+## Embedding notes
+
+- Iframes with `data-preload` on globe slides so WebGL and wasm are warm.
+- Iframe steals keyboard focus after interaction. Add the click-outside or
+  Escape handler used in h3c2p, or a visible "back to slides" affordance.
+- Every interactive slide gets a static PNG fallback slide right after it,
+  hidden in the normal flow (or a keyboard shortcut) for projector trouble.
+- Keep globe data small: one file per system at the resolution shown, AR as
+  float16 or quantized uint8 with a colormap in JS. CET-R2 for the colormap.
+- Test on the laptop while mirroring at 1080p, since the projector path
+  is where WebGL frame rates fall over.
+
+## Open questions
+
+- Final package name (skar_py is being renamed). Decide before slides are
+  public.
+- Which systems make the cut for the survey slides. Proposal lists H3, S2,
+  A5, ISEA7H, IVEA7H, rHEALPix. dggs_compare has more.
+- Whether to show the dual or duality certificate at all, or just say
+  "certified" and point at the paper.
+- Pages URL: `ajfriend.github.io/<repo>` vs a path under ajfriend.com.
+
+## Next steps
+
+1. `git init`; create `slides/` with `_quarto.yml`, `talk.qmd`, and
+   `style.css` + reveal config copied from h3c2p_talk_prep. Gitignore
+   `slides/_site/`, `scripts/raw/`, `scripts/.venv/`.
+2. `scripts/pyproject.toml` + `uv sync`; smoke-test `just render` on a
+   stub deck. Add the Pages workflow and confirm it deploys the stub.
+3. Enable GitHub Pages on csar_viz; get one CDN-loaded ajglobe globe and
+   the cone iframe rendering in the deck.
+4. Write the figure scripts against dggs_compare data.
+5. Draft slides against the skeleton, then cut to 25 minutes.
