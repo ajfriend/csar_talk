@@ -10,7 +10,6 @@ format:
     css: style.css
     output-file: index.html
     include-in-header: mathjax-macros.html
-    include-after-body: embed-keys.html
 ---
 
 ## What we'll cover
@@ -43,7 +42,10 @@ with
 ## {#cone-demo}
 
 ```{=html}
-<iframe class="fullscreen-iframe" data-preload
-  src="https://ajfriend.com/csar_viz/?embed&preset=strip&dist=2.7"
-  title="Tightest enclosing ellipsoidal cone, interactive"></iframe>
+<canvas id="cone" class="fullscreen" aria-label="Tightest enclosing ellipsoidal cone, interactive"></canvas>
+<script type="module">
+  import { mount, preset } from 'https://ajfriend.com/csar_viz/teec.js';
+  // Click the globe, then W/A/S/D tilt and spin, Q/E roll; arrows still drive the deck.
+  mount(document.getElementById('cone'), { points: preset('strip'), view: { dist: 2.7 } });
+</script>
 ```
