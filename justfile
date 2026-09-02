@@ -22,7 +22,7 @@ csar_viz := "../../csar_all/csar_viz"
 
 # Preview with the cone slide iframing the LOCAL csar_viz (deck on :8000, csar_viz on :8001). Ctrl-C stops both.
 preview: render
-    sed -i '' 's|https://ajfriend.github.io/csar_viz/|http://localhost:8001/|g' slides/_site/index.html
+    sed -i '' 's|https://ajfriend.com/csar_viz/|http://localhost:8001/|g' slides/_site/index.html
     @echo "deck:     http://localhost:8000/"
     @echo "csar_viz: http://localhost:8001/  ({{csar_viz}})"
     @trap 'kill 0' EXIT; \
