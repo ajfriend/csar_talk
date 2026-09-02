@@ -1,0 +1,6 @@
+[project]
+name = "csar-talk-scripts"
+version = "0.0.0"
+description = "Figure and data scripts for the csar FOSS4G talk"
+requires-python = ">=3.12"
+dependencies = []

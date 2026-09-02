@@ -1,0 +1,41 @@
+---
+title: "How *Squished* Are Your DGGS Cells?"
+subtitle: "A Spherical Aspect Ratio"
+author:
+  - name: AJ Friend
+    affiliation: Waymo Data Science
+format:
+  revealjs:
+    html-math-method: mathjax  # https://github.com/quarto-dev/quarto-cli/discussions/3127
+    css: style.css
+    output-file: index.html
+    include-in-header: mathjax-macros.html
+---
+
+## What we'll cover
+
+- Many DGGSs: how do we compare them?
+- Area variation is the usual axis. Shape distortion is the other.
+- Squished H3 hexagons, and why squish matters computationally
+- A spherical aspect ratio: the tightest enclosing ellipsoidal cone
+- A convex problem, solved exactly, microseconds per cell
+- Survey: H3, S2, A5, ISEA7H, IVEA7H, rHEALPix
+- Generalizing to the ellipsoid
+
+## Tightest Enclosing Ellipsoidal Cone
+
+
+$$
+\begin{array}{ll}
+\underset{A,\, b}{\text{minimize}}
+& -\logdet A \\
+\text{subject to}
+& \norm{A x_i}_2 \le b^\top x_i, \quad i = 1, \ldots, n \\
+& \norm{b}_2 \le 1
+\end{array}
+$$
+
+with
+
+- data: $x_1, \ldots, x_n \in \R^3$ (on the sphere)
+- variables: $A \in \Sym^3_{++}$ and $b \in \R^3$
