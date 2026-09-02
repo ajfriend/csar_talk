@@ -25,7 +25,7 @@ preview: render
     # Same origin as the deck (a symlink inside the render output), since a
     # cross-origin module import needs CORS headers a dev server does not send.
     ln -sfn "$(cd {{csar_viz}} && pwd)" slides/_site/csar_viz
-    sed -i '' 's|https://ajfriend.com/csar_viz/|http://localhost:8000/csar_viz/|g' slides/_site/index.html
+    sed -i '' 's|https://ajfriend.com/csar_viz/|http://localhost:8000/csar_viz/|g' slides/_site/index.html slides/_site/web/*.js
     @echo "deck: http://localhost:8000/   (csar_viz from {{csar_viz}})"
     (sleep 0.5; open http://localhost:8000/) &
     uv run --no-project -m http.server 8000 -d slides/_site --bind 127.0.0.1

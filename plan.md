@@ -114,6 +114,22 @@ Interactive (web/ -> iframed):
   sets only.
 - C2 (optional). 2D playground for C(A, b), if the math slide needs it.
 
+## Example cells (found 2026-09-02, scripts/make_cell_examples.py)
+
+Enumerated every H3 cell at res 0-2 and every S2 cell at L0-3 with csar
+(dggs_compare's tables subsample above r0/L3). The coarsest resolution
+that shows each system's real spread:
+
+- H3 res 2 (~3° cells): AR 1.000 to 1.226. Res 0 tops out at 1.07, res 1
+  at 1.14 (and only with a 7-vertex cell); finer resolutions stay at
+  ~1.22-1.25. Round: 828007fffffffff. Squished: 82082ffffffffff.
+- S2 level 3 (~12° cells): AR 1.009 to 1.548. L2 gives 1.04-1.39 at 23°;
+  L5+ settles at ~1.68. Round: 0fc0000000000000. Squished: 2ac0000000000000.
+
+Each gets a slide: points + spherical ellipse, looking down the axis,
+camera distance computed so the cell fills about half the stage
+(needs csar_viz's close-zoom camera floor of 1.02).
+
 ## Talk skeleton (draft, tune to 25 min)
 
 1. About me, H3 background. (1 min)

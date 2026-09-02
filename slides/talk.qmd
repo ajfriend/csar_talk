@@ -52,3 +52,43 @@ with
   });
 </script>
 ```
+## H3, resolution 2: a round cell
+
+```{=html}
+<canvas id="h3-low" class="stage"></canvas>
+<script type="module">
+  import { mountCell } from './web/cellslide.js';
+  mountCell('h3-low', 'h3-low');
+</script>
+```
+
+## H3, resolution 2: a squished cell
+
+```{=html}
+<canvas id="h3-high" class="stage"></canvas>
+<script type="module">
+  import { mountCell } from './web/cellslide.js';
+  mountCell('h3-high', 'h3-high');
+</script>
+```
+
+## S2, level 3: a round cell
+
+```{=html}
+<canvas id="s2-low" class="stage"></canvas>
+<script type="module">
+  import { mountCell } from './web/cellslide.js';
+  mountCell('s2-low', 's2-low');
+</script>
+```
+
+## S2, level 3: a squished cell
+
+```{=html}
+<canvas id="s2-high" class="stage"></canvas>
+<script type="module">
+  import { mountCell } from './web/cellslide.js';
+  mountCell('s2-high', 's2-high');
+</script>
+```
+
