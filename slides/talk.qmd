@@ -43,6 +43,6 @@ with
 
 ```{=html}
 <iframe class="fullscreen-iframe" data-preload
-  src="https://ajfriend.github.io/csar_viz/?embed&preset=strip"
+  src="https://ajfriend.github.io/csar_viz/?embed&preset=strip&dist=2.7"
   title="Tightest enclosing ellipsoidal cone, interactive"></iframe>
 ```
