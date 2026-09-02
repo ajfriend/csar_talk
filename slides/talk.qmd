@@ -24,7 +24,6 @@ format:
 
 ## Tightest Enclosing Ellipsoidal Cone
 
-
 $$
 \begin{array}{ll}
 \underset{A,\, b}{\text{minimize}}
@@ -39,3 +38,11 @@ with
 
 - data: $x_1, \ldots, x_n \in \R^3$ (on the sphere)
 - variables: $A \in \Sym^3_{++}$ and $b \in \R^3$
+
+## {#cone-demo}
+
+```{=html}
+<iframe class="fullscreen-iframe" data-preload
+  src="https://ajfriend.github.io/csar_viz/?embed&preset=strip"
+  title="Tightest enclosing ellipsoidal cone, interactive"></iframe>
+```

@@ -107,7 +107,9 @@ Interactive (web/ -> iframed):
   per cell shipped as data. No live solving.
 - G2. Side-by-side globes for two systems at matched resolution.
 - C1. Cone demo: click points on the sphere, watch the enclosing cone and
-  ellipse update. Iframe of the csar_viz Pages site. Small point sets only.
+  ellipse update. Iframe of the csar_viz Pages site with `?embed&preset=`
+  (and optional `show=`), which csar_viz supports for exactly this. Small
+  point sets only.
 - C2 (optional). 2D playground for C(A, b), if the math slide needs it.
 
 ## Talk skeleton (draft, tune to 25 min)
