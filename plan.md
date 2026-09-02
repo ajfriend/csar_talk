@@ -21,9 +21,10 @@ Slot: 25 minutes. Proposal text: `../proposals/ar.md`. Must mention H3.
   is published. Reuse `~/work/dggs_compare/web/globe.js` as the starting
   point: it already draws per-cell AR heatmaps from the Parquet tables.
   Globe pages live in `slides/web/` and read `slides/data/`.
-- **csar_viz only for the cone plot**, iframed from its own GitHub Pages
-  deployment (to be enabled in that repo; tag it before the talk).
-  Optionally `playground.html` for the 2D C(A, b) intuition slide.
+- **csar_viz only for the cone plot**, as a canvas mounted with its
+  `teec.js` library imported from ajfriend.com/csar_viz (pin to a tag
+  before the talk). Optionally its `playground.html` for the 2D C(A, b)
+  intuition slide.
 - **No vendoring by default.** A `just vendor` target exists as a day-of
   safety net: it snapshots ajglobe and csar_viz into the local render
   output for offline presenting on conference wifi.
@@ -107,7 +108,10 @@ Interactive (web/ -> iframed):
   per cell shipped as data. No live solving.
 - G2. Side-by-side globes for two systems at matched resolution.
 - C1. Cone demo: click points on the sphere, watch the enclosing cone and
-  ellipse update. Iframe of the csar_viz Pages site. Small point sets only.
+  ellipse update. A canvas in the slide, mounted with csar_viz's `teec.js`
+  library (imported from ajfriend.com/csar_viz), so the slide chooses the
+  points, view, and overlays, and fragments can change them. Small point
+  sets only.
 - C2 (optional). 2D playground for C(A, b), if the math slide needs it.
 
 ## Talk skeleton (draft, tune to 25 min)

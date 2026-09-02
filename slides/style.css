@@ -1,5 +1,5 @@
-/* Fill the slide area (1050x700) */
-.fullscreen-iframe {
+/* Fill the slide area (1050x700): interactive canvases and iframes */
+.fullscreen {
   position: absolute;
   border: none;
   z-index: 1;
