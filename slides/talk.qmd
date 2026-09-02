@@ -26,13 +26,13 @@ Data: $n$ points $x_1, \ldots, x_n$ on the unit sphere $\Sph^2 \subset \R^3$.
 
 $$
 \begin{array}{ll}
-\text{minimize}   & -\logdet A \\[4pt]
+\underset{A,\, b}{\text{minimize}} & -\logdet A \\[4pt]
 \text{subject to} & \norm{A x_i}_2 \le b^\top x_i, \quad i = 1, \ldots, n \\[4pt]
                   & \norm{b}_2 \le 1
 \end{array}
 $$
 
-with variables $A \in \Sym^3_{++}$ and $b \in \R^3$.
+where $A \in \Sym^3_{++}$ and $b \in \R^3$.
 
 . . .
 
