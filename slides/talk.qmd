@@ -10,6 +10,7 @@ format:
     css: style.css
     output-file: index.html
     include-in-header: mathjax-macros.html
+    include-after-body: embed-keys.html
 ---
 
 ## What we'll cover

@@ -1,0 +1,14 @@
+<script>
+// csar_viz, iframed on the cone slide, forwards keys it does not use as
+// postMessage. Re-dispatch them on this document so reveal.js navigation
+// keeps working while the iframe has focus.
+window.addEventListener('message', e => {
+  const m = e.data;
+  if (!m || m.source !== 'csar_viz' || m.type !== 'keydown') return;
+  document.dispatchEvent(new KeyboardEvent('keydown', {
+    key: m.key, code: m.code, keyCode: m.keyCode, shiftKey: m.shiftKey,
+    altKey: m.altKey, ctrlKey: m.ctrlKey, metaKey: m.metaKey,
+    bubbles: true, cancelable: true,
+  }));
+});
+</script>
