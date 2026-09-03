@@ -74,6 +74,6 @@ with
 ## S2, level 3: a squished cell
 
 ```{=html}
-<canvas class="r-stretch stage" data-cell="s2-high"></canvas>
+<canvas class="r-stretch stage" data-cell="s2-high" data-edit></canvas>
 ```
 
