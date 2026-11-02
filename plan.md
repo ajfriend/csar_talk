@@ -114,20 +114,71 @@ Interactive (web/ -> iframed):
   sets only.
 - C2 (optional). 2D playground for C(A, b), if the math slide needs it.
 
-## Talk skeleton (draft, tune to 25 min)
+## Example cells (found 2026-09-02, scripts/make_cell_examples.py)
 
-1. About me, H3 background. (1 min)
-2. Many DGGSs, how to compare. Area variation is the usual axis. (2 min)
-3. The other axis: shape. Squished H3 hexes. G1 hook. (3 min)
-4. Why it matters computationally. (2 min)
-5. Existing shape metrics and where they fall short: IPQ, chart-based AR,
-   Tissot. (2 min)
-6. Definition: tightest enclosing ellipsoidal cone, AR = a/b. C1 demo. (5 min)
-7. It's a convex problem, solved exactly with a certificate, microseconds
-   per cell. Brief, one or two slides. (2 min)
-8. Survey: histograms, by resolution, globes for each system. (5 min)
-9. AR vs IPQ. (1 min)
-10. Ellipsoids, WGS84, what's next. Package name, links. (2 min)
+Enumerated every H3 cell at res 0-2 and every S2 cell at L0-3 with csar
+(dggs_compare's tables subsample above r0/L3). The coarsest resolution
+that shows each system's real spread:
+
+- H3 res 2 (~3° cells): AR 1.000 to 1.226. Res 0 tops out at 1.07, res 1
+  at 1.14 (and only with a 7-vertex cell); finer resolutions stay at
+  ~1.22-1.25. Round: 828007fffffffff. Squished: 82082ffffffffff.
+- S2 level 3 (~12° cells): AR 1.009 to 1.548. L2 gives 1.04-1.39 at 23°;
+  L5+ settles at ~1.68. Round: 0fc0000000000000. Squished: 2ac0000000000000.
+
+Each gets a slide (slides/web/cellslide.js mounts every `canvas[data-cell]`);
+the camera closes in on cells this small, so csar_viz's distance floor is 1.02.
+
+## Talk skeleton (drafted 2026-11-01 in slides/talk.qmd; ~21 min talking)
+
+Scope decisions, against the proposal (`../proposals/ar.md`):
+
+- **Spherical only.** The ellipsoid is one slide: Gauss says no
+  ellipsoid-to-sphere map is both conformal and equal-area, so area and
+  shape use different auxiliary spheres (authalic vs conformal latitude);
+  the shape difference is at most ~0.2%. Left as an open modeling choice.
+- **IPQ by the analytic response curve** (`scripts/make_ipq_curve.py`,
+  numbers from `csar_paper/positioning-notes.md`), not per-cell IPQ.
+  dggs_compare issue 90 (per-cell IPQ) stays open; not needed for the talk.
+- **Globes are the live dggs_compare site, iframed** as a slide
+  background. No talk-owned globe pages (G1/G2 in the inventory are
+  dropped). Needs a screenshot fallback slide for bad wifi.
+- **Survey figures are copied from dggs_compare/out** (histograms,
+  area_histograms, tradeoff). Four systems in the headline figures;
+  IVEA7H and rHEALPix only on the site. Per-resolution plots cut: AR is
+  resolution-stable, said in one sentence.
+- Convex optimization is two slides: global optimum + certificate (with
+  the declarative/agents point as one spoken sentence), then the software.
+
+Budget (25-minute slot; minute targets also in the speaker notes):
+
+| section | slides | min |
+|---|---|---|
+| title, about me | 2 | 1 |
+| problem: many DGGSs, area is the usual axis, shape is the other | 3 | 2 |
+| hook: round vs squished H3 and S2 cells | 4 | 2 |
+| why squish matters | 1 | 1.5 |
+| definition, math, live demo | 3 | 4 |
+| convex + certified; the software | 2 | 2 |
+| survey: tradeoff, histograms, globes, table | 4 | 5 |
+| vs IPQ | 1 | 1.5 |
+| ellipsoid, the open question | 1 | 1 |
+| close + links | 2 | 1.5 |
+| | | 21.5 |
+
+Still to do before the talk:
+
+1. ~~Merge and deploy csar_viz `close-zoom`.~~ Done 2026-11-02 (PR #8 there);
+   the hosted teec.js now has `view.fit` and the 1.02 floor. Still to do:
+   tag csar_viz and pin the deck's import to that tag.
+2. Screenshot of the globes tab for the fallback slide.
+3. A figure for "why squish matters" (k-ring on a round vs squished cell),
+   or keep it text.
+4. IVEA7H and rHEALPix rows in the summary table, from the site.
+5. Native per-cell timing line on the software slide (csar_zig/bench).
+6. dggs_compare `?embed` mode so the iframed globes sit above the fold.
+7. Pages workflow, `just vendor`, slides URL on the thanks slide.
+8. Timed run-through; cut S2-round and section-title slides first if long.
 
 ## Embedding notes
 
