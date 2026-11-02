@@ -182,7 +182,9 @@ Still to do before the talk:
 4. ~~IVEA7H and rHEALPix rows in the summary table.~~ Done; both have globes too.
 5. Native per-cell timing line on the software slide (csar_zig/bench).
 6. ~~dggs_compare `?embed` mode.~~ Moot: no iframe; see 2.
-7. Pages workflow and the slides URL on the thanks slide.
+7. ~~Pages workflow and the slides URL on the thanks slide.~~ Done 2026-11-02
+   (`.github/workflows/pages.yml`; the site is ajfriend.com/csar_talk, the
+   user site's domain over the repo name, like dggs_compare).
 8. Timed run-through; cut S2-round and section-title slides first if long.
 
 ## Embedding notes
@@ -205,7 +207,6 @@ Still to do before the talk:
   A5, ISEA7H, IVEA7H, rHEALPix. dggs_compare has more.
 - Whether to show the dual or duality certificate at all, or just say
   "certified" and point at the paper.
-- Pages URL: `ajfriend.github.io/<repo>` vs a path under ajfriend.com.
 
 ## Next steps
 

@@ -5,8 +5,8 @@
 aspect ratio of the H3 cell (res 7) and the S2 cell (level 12) containing
 them, and print the extremes. Picked from the output (2026-11-02): H3 in
 Sydney (roundest major city, 1.001), H3 in Seoul (1.206; Trondheim and
-Bodø are slightly higher but nobody knows their shape), S2 in Osaka
-(1.705; Sulaymaniyah and Kirkuk slightly higher, same objection).
+Bodø are slightly higher, but their outlines are less recognisable), S2 in Osaka
+(1.705; Sulaymaniyah and Kirkuk slightly higher, same reason).
 
 AR is resolution-stable for small cells, so the resolution chosen here
 only needs to be fine enough that the cell sits inside the city.

@@ -310,8 +310,8 @@ the slide does double duty: motivation and a preview of the definition.
 (`figs/ipq_vs_ar.png`) with the polygon-class lines, and the facts behind
 it: IPQ moves under 3% across the AR band where hexagonal DGGS cells live,
 polygon class moves it far more, so cross-system IPQ comparisons mostly
-compare hexagons to squares. Keep "the published conclusion is partly a
-metric artifact" for the answer to a direct question, not the slide.
+compare hexagons to squares. If asked directly: cross-system compactness rankings partly reflect
+polygon class. That is an answer, not a slide.
 
 **Tone:** "a different question," never "IPQ is wrong." IPQ sees boundary
 roughness, which AR ignores. Companions.

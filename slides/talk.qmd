@@ -18,8 +18,6 @@ author:
 Slides: [ajfriend.com/csar_talk](https://ajfriend.com/csar_talk)<br>
 Code: [github.com/ajfriend/csar_py](https://github.com/ajfriend/csar_py)
 
-<!-- TODO: confirm the slides URL once the Pages site exists -->
-
 ::: {.notes}
 1 min, with the title slide. Same intro as the co-compaction talk.
 
@@ -69,7 +67,7 @@ See Kimerling, Sahr, White & Song (1999), *Comparing geometrical properties of g
 Under a minute. "Close together" is Tobler's first law (near things are more
 related than distant things), which is what Kimerling invokes; say the name
 if the room wants it. The field's own argument for compact cells, from the
-founding paper of the equal-area camp (Sahr wrote DGGRID and ISEA3H),
+founding paper of the equal-area tradition (Sahr wrote DGGRID and ISEA3H),
 and it is really an argument about distance within a cell, which is
 exactly what stretch violates. Original: "Because a single vector of
 values will be associated with all the points in a single areal cell, it
@@ -446,7 +444,7 @@ with shape, uniformly.
 <div class="globe-wrap"><canvas data-globe="rhealpix_r4"></canvas></div>
 
 ::: {.notes}
-The weird one. rHEALPix is equal-area and square, built from a cube with
+A different construction. rHEALPix is equal-area and square, built from a cube with
 the two polar faces folded in. Mid-latitudes are nearly round. The polar
 caps are where it pays: cells stretch toward the cap corners and the worst
 cell is 2.38, the most stretched of any system here, on a few cells. Most
@@ -534,4 +532,4 @@ show magnitude only. All of it is on the site, with the data as Parquet.
 - Survey and globes: [ajfriend.com/dggs_compare](https://ajfriend.com/dggs_compare/)
 - The demo: [ajfriend.com/csar_viz](https://ajfriend.com/csar_viz/)
 - Paper in preparation
-- These slides: <!-- TODO: Pages URL -->
+- These slides: [ajfriend.com/csar_talk](https://ajfriend.com/csar_talk/)

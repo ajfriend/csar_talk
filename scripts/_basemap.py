@@ -45,7 +45,7 @@ def tile_bounds_merc(x, y, z):
 
 def fetch_tile(z, x, y):
     p = fetch(TILE_URL.format(z=z, x=x, y=y), TILES / f'{z}_{x}_{y}.png',
-              headers={'User-Agent': 'csar-talk-figure/1.0 (ajfriend@gmail.com)'})
+              headers={'User-Agent': 'csar-talk-figure/1.0 (https://github.com/ajfriend/csar_talk)'})
     return Image.open(p).convert('RGB')
 
 
