@@ -22,8 +22,8 @@ Slot: 25 minutes. Proposal text: `../proposals/ar.md`. Must mention H3.
   point: it already draws per-cell AR heatmaps from the Parquet tables.
   Globe pages live in `slides/web/` and read `slides/data/`.
 - **csar_viz only for the cone plot**, as a canvas mounted with its
-  `teec.js` library imported from ajfriend.com/csar_viz (pin to a tag
-  before the talk). Optionally its `playground.html` for the 2D C(A, b)
+  `teec.js` library imported from jsDelivr at a csar_viz tag (v0.1.0 now; bump in
+  `slides/web/cellslide.js` and the justfile together). Optionally its `playground.html` for the 2D C(A, b)
   intuition slide.
 - **No vendoring by default.** A `just vendor` target exists as a day-of
   safety net: it snapshots ajglobe and csar_viz into the local render
@@ -169,8 +169,8 @@ Budget (25-minute slot; minute targets also in the speaker notes):
 Still to do before the talk:
 
 1. ~~Merge and deploy csar_viz `close-zoom`.~~ Done 2026-11-02 (PR #8 there);
-   the hosted teec.js now has `view.fit` and the 1.02 floor. Still to do:
-   tag csar_viz and pin the deck's import to that tag.
+   the hosted teec.js now has `view.fit` and the 1.02 floor; csar_viz is
+   tagged v0.1.0 and the deck imports that tag via jsDelivr.
 2. Screenshot of the globes tab for the fallback slide.
 3. A figure for "why squish matters" (k-ring on a round vs squished cell),
    or keep it text.
