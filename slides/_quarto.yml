@@ -6,3 +6,12 @@ project:
   resources:
     - web
     - data
+format:
+  revealjs:
+    html-math-method: mathjax  # https://github.com/quarto-dev/quarto-cli/discussions/3127
+    css: style.css
+    output-file: index.html
+    include-in-header: mathjax-macros.html
+    include-after-body: cellslides.html
+    slide-number: true
+    preload-iframes: true

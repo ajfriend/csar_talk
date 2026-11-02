@@ -1,0 +1,7 @@
+ajglobe.min.js: the ES module bundle of https://github.com/ajfriend/ajglobe
+at the `scaled-host` branch (v0.0.3 plus: pointer mapping in the canvas's
+own pixel frame, so drags are right inside a CSS-scaled reveal.js slide;
+consumed keys stop propagating to the host; zoom 1 fits the globe in a
+canvas of any aspect, not just landscape). dist/ is not committed there
+and the package is not on npm yet, so it is vendored.
+Rebuild: `just build` in the ajglobe checkout, copy dist/ajglobe.min.js.

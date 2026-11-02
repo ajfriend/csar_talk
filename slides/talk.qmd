@@ -4,33 +4,8 @@ subtitle: "A Spherical Aspect Ratio"
 author:
   - name: AJ Friend
     affiliation: Waymo Data Science
-format:
-  revealjs:
-    html-math-method: mathjax  # https://github.com/quarto-dev/quarto-cli/discussions/3127
-    css: style.css
-    output-file: index.html
-    include-in-header: mathjax-macros.html
-    include-after-body: cellslides.html
-    slide-number: true
-    preload-iframes: true
+# format options are in _quarto.yml, so the offline profile can override them
 ---
-
-<!--
-Time budget (25-minute slot; aim for ~21 minutes talking, the rest for
-questions and slippage). Minute targets are in each section's speaker notes.
-
-  1.0  title + about me
-  2.0  problem: many DGGSs, area is the usual axis, shape is the other
-  2.0  hook: round vs squished cells
-  1.5  why squish matters
-  4.0  definition + live demo
-  2.0  convex, certified, the software
-  5.0  survey: tradeoff, histograms, globes, table
-  1.5  vs IPQ
-  1.0  ellipsoid, the open question
-  1.5  close + links
- 21.5
--->
 
 ## About
 
@@ -47,137 +22,244 @@ Code: [github.com/ajfriend/csar_py](https://github.com/ajfriend/csar_py)
 
 ::: {.notes}
 1 min, with the title slide. Same intro as the co-compaction talk.
+
+Time budget (25-minute slot; aim for ~21 minutes talking). The live
+budget is the table in beats.md; per-section targets are in each
+section's notes.
 :::
 
-# The problem
+## How *squished* are these cells?
 
-## Many DGGSs. How do we compare them?
+<!-- figure: scripts/make_city_grids.py (basemap glue: scripts/_basemap.py);
+     cities chosen by scripts/score_cities.py. Same true ground extent in
+     every panel; OSM tiles, Web Mercator. -->
+![](figs/city_grids.jpg){width="100%"}
+
+::: {style="font-size: 0.8em"}
+H3 grid in two locations. S2 cells are stretched in one direction.\*
+:::
+
+::: {.fine}
+\* Web Mercator. At city scale, cell shape matches the sphere: the distortion comes from the grid, not the projection.
+:::
+
+::: {.notes}
+Sydney, Seoul, Osaka. The first two are the same system at the same
+resolution; the only difference is where on the globe. Something is up,
+and the question is how much. If asked "isn't that the map projection?":
+web map tiles are Web Mercator, which is conformal, so at city scale every
+shape on screen is true to the sphere. The squish is the grid's. And the
+metric we get to never projects anything at all.
+:::
+
+## Why shape matters
+
+- one cell, one value, for every point inside it
+- so points in a cell should be close together
+- stretched cell: points far apart in one direction
+
+<!-- figure: scripts/make_neighbors.py -->
+![](figs/neighbors.png){width="100%"}
+
+::: {.fine}
+See Kimerling, Sahr, White & Song (1999), *Comparing geometrical properties of global grids*, criterion 5
+:::
+
+::: {.notes}
+Under a minute. "Close together" is Tobler's first law (near things are more
+related than distant things), which is what Kimerling invokes; say the name
+if the room wants it. The field's own argument for compact cells, from the
+founding paper of the equal-area camp (Sahr wrote DGGRID and ISEA3H),
+and it is really an argument about distance within a cell, which is
+exactly what stretch violates. Original: "Because a single vector of
+values will be associated with all the points in a single areal cell, it
+is preferable that the actual values of all the points in the cell be as
+much alike as possible. Maximal compactness ensures that the points in a
+cell are as close to each other as possible, thus taking advantage of
+Tobler's first law of geography." (p. 273)
+:::
+
+## Everything on the sphere
+
+One arena for every grid, sphere-defined or WGS84-defined.
+
+- **plane**: no. Every projection distorts shape.
+- **WGS84**: no. Much harder math, for a ~0.2% correction.
+- **sphere**: yes. Exact to floating point; every grid can be brought to it.
+
+::: {.fine}
+Every picture here is a zoomed-in patch of the sphere: at cell scale, flat and spherical agree. Every number is computed on the sphere.
+:::
+
+::: {.notes}
+Half a minute. The one modeling decision, stated once. Grids defined on
+WGS84 are mapped to the sphere by an auxiliary latitude before measuring
+(authalic, which keeps the equal-area grids exactly equal-area). The
+sphere-vs-WGS84 effect, measured on 400k cells (dggs_compare #89): AR
+changes by at most 0.22% (worst at the equator), area by a 0.67% spread.
+No grid is anywhere near conformal (best worst-case AR ~1.21), so 0.22%
+is invisible against every grid's own stretch. Cells are
+spherical polygons with great-circle edges, and both metrics are computed
+on that object with no projection anywhere.
+:::
+
+## Options to measure shape
+
+1. **compactness**, the standard: how close to a circle
+   - IPQ: perimeter of the cap with the same area ÷ perimeter of the shape, squared
+   - 1 for a cap, smaller for everything else
+2. **aspect ratio**, this talk: how stretched
+   - defined next
+
+::: {.notes}
+Under a minute. Two ways to put a number on shape. Compactness is what the
+field uses (Kimerling 1999, Kmoch 2022). In symbols, IPQ = A(4π−A)/P² with
+A the spherical area and P the perimeter: on the unit sphere a cap of
+area A has perimeter² = A(4π−A) (the isoperimetric identity; 4π−A is the
+complementary cap's area), so IPQ is the squared ratio of that cap's
+perimeter to the shape's: the form the sphere's isoperimetric inequality
+P² ≥ A(4π−A) gives, and exactly what Kimerling's ZSC is the square root of
+(zone perimeter over cell perimeter). The planar 4πA/P² is its small-cell
+limit; in the plane the area-ratio and perimeter-ratio definitions agree,
+on the sphere they split and this is the perimeter one. Practical implementations
+usually compute the planar one after projecting each cell. Aspect
+ratio is the one this talk defines: how stretched. The next slides are
+drawn flat because at cell scale the sphere is flat to one part in a
+million, but every number on them is computed on the sphere.
+:::
+
+<!-- Four live slides: the shapes are drawn ON the sphere by the same
+     library as the cell slides (points + numbers from scripts/make_stretch.py
+     via slides/data/shapes.js; captions filled in by web/cellslide.js).
+     data-dist on the .pair: one camera distance for every shape, so a 1.5x
+     stretch looks 1.5x wider. -->
+
+## Isn't compactness enough? {#ipq-square}
+
+```{=html}
+<div class="pair" data-dist="2.4">
+  <div><canvas class="stage" data-cell="square" data-show="hull,rim" data-nums></canvas></div>
+  <div><canvas class="stage" data-cell="square_stretched" data-show="hull,rim" data-nums></canvas></div>
+</div>
+```
+
+::: {.point}
+Stretch a square 1.5x. Aspect ratio reads 1.5: the stretch you applied.<br>
+**When you say a cell is squished, this is the number you mean.**
+:::
+
+::: {.notes}
+About 1.5 min for the four slides. A 3:2 rectangle is what everyone already
+calls "aspect ratio 1.5". Compactness moved a little, in the right
+direction, to a number nobody could have predicted. Both shapes are a few
+degrees across, on the sphere, with their enclosing ellipses solved live.
+:::
+
+## Isn't compactness enough? {#ipq-class}
+
+```{=html}
+<div class="pair" data-dist="2.4">
+  <div><canvas class="stage" data-cell="square" data-show="hull,rim" data-nums></canvas></div>
+  <div><canvas class="stage" data-cell="hexagon" data-show="hull,rim" data-nums></canvas></div>
+</div>
+```
+
+::: {.point}
+Neither is stretched. Compactness already differs: it scores the polygon, not the stretch.
+:::
+
+::: {.notes}
+A square and a hexagon, both as round as their polygon class allows.
+Compactness separates them by 0.11 before anything is distorted. Aspect
+ratio says 1 for both: nothing to undo. Comparing H3 to S2 on compactness
+is mostly comparing hexagons to squares.
+:::
+
+## Isn't compactness enough? {#ipq-hexagon}
+
+```{=html}
+<div class="pair" data-dist="2.4">
+  <div><canvas class="stage" data-cell="hexagon" data-show="hull,rim" data-nums></canvas></div>
+  <div><canvas class="stage" data-cell="hexagon_stretched" data-show="hull,rim" data-nums></canvas></div>
+</div>
+```
+
+::: {.point}
+Same stretch, same 1.5. Compactness depends on the shape you started with.
+:::
+
+::: {.notes}
+A stretched hexagon still out-scores a perfect square on compactness
+(the numbers are on screen): polygon class moves it more than the stretch
+does. Say this
+verbatim: "IPQ is a good measure of what it measures. Within one DGGS every
+cell is about equally smooth, so stretch is what varies, and that's what
+this isolates."
+
+If asked about Kimerling's numbers: his ZSC is the square root of IPQ, which
+halves every change here; same conclusion. If asked "stretched how?": a
+stretch of the gnomonic coordinates, the one stretch that maps cones to
+cones, so AR scales by exactly the factor at any size (checked to 50°).
+:::
+
+## Isn't compactness enough? {#ipq-star}
+
+```{=html}
+<div class="pair" data-dist="2.4">
+  <div><canvas class="stage" data-cell="star" data-show="outline,rim" data-nums></canvas></div>
+</div>
+```
+
+::: {.point}
+Complementary: the star is round by aspect ratio, and badly compact.<br>
+Compactness sees the boundary. Aspect ratio sees only stretch.
+:::
+
+::: {.notes}
+The foil in the other direction: by symmetry its enclosing ellipse is a
+circle, so AR is 1; its perimeter is enormous, so IPQ collapses. Two
+instruments, two questions. This talk is about the second one.
+:::
+
+# A spherical aspect ratio
+
+## The idea {.smaller}
 
 :::: {.columns}
 
-::: {.column width="50%"}
-- H3, S2, A5
-- ISEA7H, IVEA7H, ISEA3H
-- rHEALPix, HEALPix
-- ...
+::: {.column width="56%"}
+Given a cell's corner points on the sphere:
+
+1. **tightest elliptical cone**, apex at the center, containing them
+2. its rim: an ellipse on the sphere, tight around the corners
+3. $\text{AR} = \dfrac{\text{long axis}}{\text{short axis}} \ge 1$
+
+1 is round. Bigger is more stretched.
 :::
 
-::: {.column width="50%"}
-Things people measure:
+::: {.column width="44%"}
+**Properties**
 
-- **area** variation
-- hierarchy, aperture, indexing
-- neighbor structure
-- **shape**
+- input: corner points only
+- no projection, no center to choose
+- works everywhere: no poles, no antimeridian
+- one answer: convex, so unique, with a certificate
+- scale-free: proportion, not size
 :::
 
 ::::
 
 ::: {.notes}
-2 min for this section. Everyone measures area. The equal-area systems win
-that axis by construction. This talk is about the other axis.
-:::
-
-## Area is the axis everyone measures
-
-![](figs/area_histograms.png){height="600"}
-
-::: {.notes}
-Area-matched resolutions, about H3 res 9 cell size. A5 and ISEA7H are a
-single bar: equal-area by construction. H3 and S2 spread by a factor of
-1.8 and 2. This is the usual story. Now the other axis.
-:::
-
-## Shape is the other axis
-
-Same cell count, same area. Not the same shape.
-
-- Some cells are visibly **wider in one direction** than the other
-- Call it anisotropy, elongation, aspect ratio, or *squish*
-- The usual metrics do not quite measure it (more on that later)
-
-::: {.notes}
-Transition to the hook: let me show you what I mean.
-:::
-
-# Some cells are squished
-
-## H3, resolution 2: a round cell
-
-```{=html}
-<canvas class="r-stretch stage" data-cell="h3-low"></canvas>
-```
-
-::: {.notes}
-2 min for the four cell slides. The ellipse through the vertices is the
-thing we will define in a minute. Here it is nearly a circle: AR 1.00.
-:::
-
-## H3, resolution 2: a squished cell
-
-```{=html}
-<canvas class="r-stretch stage" data-cell="h3-high"></canvas>
-```
-
-::: {.notes}
-Same system, same resolution, a different place on the globe: AR 1.23.
-About a quarter wider one way than the other.
-:::
-
-## S2, level 3: a round cell
-
-```{=html}
-<canvas class="r-stretch stage" data-cell="s2-low"></canvas>
-```
-
-::: {.notes}
-Cut this slide if short on time; the S2 squished cell carries the point.
-:::
-
-## S2, level 3: a squished cell
-
-```{=html}
-<canvas class="r-stretch stage" data-cell="s2-high" data-edit></canvas>
-```
-
-::: {.notes}
-AR 1.55. A cube face corner. (This canvas is editable: you can drag a
-vertex to show the ellipse respond, as a preview of the demo.)
-:::
-
-## Why squish matters
-
-Anything that treats neighbors as equidistant is wrong by about the aspect ratio:
-
-- **neighbor distances**: center-to-center spacing differs by direction
-- **gradients and flows**: finite-difference stencils assume isotropy
-- **convolution kernels**: a "circular" k-ring is an ellipse on the ground
-- **aggregation**: a cell's footprint is a worse proxy for a disk
-
-<!-- TODO figure: a k-ring on a round cell vs a squished cell, same resolution -->
-
-::: {.notes}
-1.5 min. Don't belabor it. One sentence per bullet. The point is that
-shape is not cosmetic.
-:::
-
-# A spherical aspect ratio
-
-## The idea
-
-Given the vertices of a cell on the unit sphere:
-
-1. Find the **tightest ellipsoidal cone** (apex at the sphere's center) that encloses them
-2. Its cross-section is an ellipse; on the sphere it is the **rim** you saw drawn through the vertices
-3. $\text{AR} = \dfrac{\text{major semi-axis}}{\text{minor semi-axis}} \ge 1$
-
-AR 1 is a circular cap. Larger is more squished.
-
-::: {.notes}
 4 min for definition + demo. Why a cone and not an ellipse in some map
 projection? Because the cone lives in 3D with the sphere and needs no
 projection, no centroid, no tangent plane chosen by hand. The optimum
-picks the axis.
+picks the axis. The properties are what separate this from the obvious
+alternatives: nothing is chosen by hand, the answer is unique and
+checkable, and the same cell scores the same at any size. "Works
+everywhere" is a consequence of taking unit vectors: a cell at the pole
+or straddling 180° is just points on a sphere, nothing special about it.
+Any per-cell projection pipeline has to special-case those seams; this
+never meets them. Say it as a feature, not a critique.
 :::
 
 ## Tightest Enclosing Ellipsoidal Cone
@@ -225,6 +307,51 @@ the browser in about 3 ms, with the real solver compiled to WebAssembly.
 Budget 2 min here and no more.
 :::
 
+# The same cells, measured
+
+## H3, resolution 2: a round cell
+
+```{=html}
+<canvas class="r-stretch stage" data-cell="h3-low"></canvas>
+```
+
+::: {.notes}
+2 min for the four cell slides: the ellipse from the demo, on real cells.
+This one is nearly a circle: AR 1.00.
+:::
+
+## H3, resolution 2: a stretched cell
+
+```{=html}
+<canvas class="r-stretch stage" data-cell="h3-high"></canvas>
+```
+
+::: {.notes}
+Same system, same resolution, a different place on the globe: AR 1.23.
+About a quarter wider one way than the other.
+:::
+
+## S2, level 3: a round cell
+
+```{=html}
+<canvas class="r-stretch stage" data-cell="s2-low"></canvas>
+```
+
+::: {.notes}
+Cut this slide if short on time; the S2 squished cell carries the point.
+:::
+
+## S2, level 3: a stretched cell
+
+```{=html}
+<canvas class="r-stretch stage" data-cell="s2-high" data-edit></canvas>
+```
+
+::: {.notes}
+AR 1.55. A cube face corner. (This canvas is editable: drag a vertex and
+the ellipse follows, if the room wants to see it again.)
+:::
+
 # How it is solved
 
 ## It is a convex problem
@@ -253,108 +380,151 @@ Point back at the demo. Microseconds per cell natively; the whole survey
 that follows is a few million solves.
 :::
 
-# The survey
+# Comparing grids
+
+## {#h3-globe menu-title="H3 globe"}
+
+<div class="globe-wrap"><canvas data-globe="h3_r3"></canvas></div>
+
+::: {.notes}
+3.5 min for the globes. Section opener, spoken: everyone measures area,
+and the equal-area systems win that axis by construction; this is the
+other axis. Every H3 cell at resolution 3, colored by
+aspect ratio on a scale shared by all the globes that follow. The
+stretch follows the icosahedron edges: H3 is round mid-face and
+stretched where the gnomonic faces meet. Drag it. Then hit the area
+toggle: the warm colors are the other field, and it is not the same
+picture. Area peaks mid-face, stretch peaks at the edges. Two axes.
+Hover a cell for both numbers; click one and the solver draws its
+ellipse live.
+:::
+
+## {#s2-globe menu-title="S2 globe"}
+
+<div class="globe-wrap"><canvas data-globe="s2_r6"></canvas></div>
+
+::: {.notes}
+S2 at level 6: the cube. Round at face centres, stretched to 1.7 at
+the cube corners (Osaka from the opening slide sits near one).
+:::
+
+## {#isea7h-globe menu-title="ISEA7H globe"}
+
+<div class="globe-wrap"><canvas data-globe="isea7h_r4"></canvas></div>
+
+::: {.notes}
+ISEA7H, equal-area by construction. The price: a six-pointed star of
+stretch on every icosahedron face, max 1.3. The pentagons are the
+small dark spots at the vertices.
+:::
+
+## {#ivea7h-globe menu-title="IVEA7H globe"}
+
+<div class="globe-wrap"><canvas data-globe="ivea7h_r4"></canvas></div>
+
+::: {.notes}
+Same grid, different projection: IVEA replaces ISEA's equal-area
+projection with one whose distortion is spread smoothly instead of
+concentrated at the face edges. The six-pointed stars are gone; the
+stretch is a smooth pinwheel on each face, and the worst cell is better.
+Still exactly equal-area. This is the kind of design change the metric is
+for: you can see what the new projection bought.
+:::
+
+## {#a5-globe menu-title="A5 globe"}
+
+<div class="globe-wrap"><canvas data-globe="a5_r6"></canvas></div>
+
+::: {.notes}
+A5, also equal-area. Its cells are never round: the whole globe sits
+at about 2. The scale tops out at 2.38, rHEALPix's worst, next slide. Equal area was bought
+with shape, uniformly.
+:::
+
+## {#rhealpix-globe menu-title="rHEALPix globe"}
+
+<div class="globe-wrap"><canvas data-globe="rhealpix_r4"></canvas></div>
+
+::: {.notes}
+The weird one. rHEALPix is equal-area and square, built from a cube with
+the two polar faces folded in. Mid-latitudes are nearly round. The polar
+caps are where it pays: cells stretch toward the cap corners and the worst
+cell is 2.38, the most stretched of any system here, on a few cells. Most
+of the globe is fine, so the median is 1.18 and the extreme is in the
+tail. This is the case the "max or weighted?" open question is about.
+:::
+
+## Six systems, side by side
+
+| system | median AR | max AR | area, max ÷ min |
+|---|---:|---:|---:|
+| H3 | 1.06 | 1.22 | 1.80 |
+| S2 | 1.23 | 1.70 | 2.01 |
+| ISEA7H | 1.17 | 1.35 | 1.00 |
+| IVEA7H | 1.15 | 1.21 | 1.00 |
+| A5 | 2.13 | 2.31 | 1.00 |
+| rHEALPix | 1.18 | 2.38 | 1.00 |
+
+::: {.fine}
+At matched cell size, about H3 resolution 9 (1 000 km² per cell). More systems and every resolution at [ajfriend.com/dggs_compare](https://ajfriend.com/dggs_compare/).
+:::
+
+::: {.notes}
+1 min. The globes in six rows. H3 and S2 trade area for shape; ISEA7H,
+IVEA7H, A5, and rHEALPix are exactly equal-area and pay in shape: ISEA7H
+a little, IVEA7H less (same grid, better projection), A5 a lot everywhere,
+rHEALPix a lot but only at the polar caps (median 1.18, max 2.38).
+Numbers are at the survey's working resolutions (H3 r9, S2 L15, ISEA7H
+r10, A5 r14), finer than the globes, and AR is resolution-stable, so they
+agree with what you just hovered.
+:::
 
 ## Shape versus area, at matched resolution
 
 ![](figs/tradeoff.png){height="560"}
 
 ::: {.notes}
-5 min for the survey. This is the one picture. Ideal grid is the star.
-Equal-area systems sit on the floor, but pay in shape: ISEA7H a little,
-A5 a lot (its cells are never round, AR about 2). H3 and S2 trade the
-other way: better shape, worse area. Nobody is at the star. Nobody can
-be: you cannot tile a sphere with identical round cells.
+1.5 min, and this is the close. The one picture. The ideal grid is the
+star. Equal-area systems sit on the floor, but pay in shape: ISEA7H a
+little, A5 a lot (its cells are never round, AR about 2). H3 and S2 trade
+the other way: better shape, worse area. Nobody is at the star, and
+nobody can be: you cannot tile a sphere with identical round cells.
+
+The message, spoken, not on a slide: equal area is a fine goal, and it is
+one goal. Shape, hierarchy, indexing, neighbours, ease of implementation.
+Every DGGS picks a point in that space. Aspect ratio is one axis of it,
+and now it is cheap and exact to measure. Use it to see the trade-off you
+are already making.
 :::
 
-## Aspect-ratio distributions
+# Open questions
 
-![](figs/histograms.png){height="620"}
+## Work in progress
 
-::: {.notes}
-Log counts. H3 is tight, 1.00 to 1.22. S2 stretches to 1.70 at cube
-corners. A5 is a narrow band around 2.1. ISEA7H 1.09 to 1.35, the
-projection's distortion field. AR is nearly resolution-independent for
-small cells, so these shapes persist at every finer level.
-:::
+- **sphere vs. ellipsoid**: which sphere is fair? does 0.2% matter?
+- **extreme cells**: pentagons, cube corners. max? or weighted?
+- **matching resolutions**: equal count? equal mean area?
+- **sampling**: every cell, or points? points are size-biased
+- **direction**: AR has an axis. kernels feel the field
 
-## {background-iframe="https://ajfriend.com/dggs_compare/#globes" background-interactive="true" menu-title="Where on the globe? (live)"}
+<br>
 
-<!-- TODO: dggs_compare needs an ?embed mode (globes grid only, no page header) so the slide shows the globes above the fold. Until then scroll inside the iframe. -->
-
-::: {.notes}
-Live site, one globe per system, colored by AR. Spin H3: the bands of
-squish follow the icosahedron edges. S2: cube corners. ISEA7H: a six-
-pointed star on every face. If the wifi is bad, skip to the next slide.
-:::
-
-## Where on the globe? (fallback)
-
-<!-- TODO: screenshot of the globes tab at ajfriend.com/dggs_compare for projector/wifi trouble -->
-
-*Screenshot placeholder. Hidden from the normal flow once the screenshot exists.*
-
-## Summary, at about H3 res 9 cell size
-
-| system | median AR | max AR | area max/min |
-|---|---:|---:|---:|
-| H3 r9 | 1.06 | 1.22 | 1.80 |
-| S2 L15 | 1.23 | 1.70 | 2.01 |
-| A5 r14 | 2.13 | 2.31 | 1.00 |
-| ISEA7H r10 | 1.17 | 1.35 | 1.00 |
-
-<!-- TODO: add IVEA7H r10 and rHEALPix r9 rows from the dggs_compare site -->
-
-More systems, every resolution, and the data: [ajfriend.com/dggs_compare](https://ajfriend.com/dggs_compare/)
+All the data: [ajfriend.com/dggs_compare](https://ajfriend.com/dggs_compare/)
 
 ::: {.notes}
-The tradeoff in numbers. Then: "but wait, isn't there already a shape
-metric?"
-:::
-
-# Aspect ratio versus IPQ
-
-## IPQ measures something else
-
-![](figs/ipq_vs_ar.png){height="520"}
-
-::: {.notes}
-1.5 min. The isoperimetric quotient, 4 pi A over P squared, is the
-field's shape metric. For a pure ellipse it moves under 3% across the
-whole band where hexagonal DGGS cells live, less than a quarter of the
-hexagon-to-square gap. Polygon class dominates it; elongation is noise
-in it. IPQ does see boundary roughness, which AR ignores. Companions,
-not competitors: IPQ for roundness-of-boundary, AR for elongation.
-:::
-
-# What about the ellipsoid?
-
-## The sphere is the honest place to define it
-
-- Everything so far is on the sphere: the metric is exact, the only error is floating point
-- Real grids live on WGS84 (some of them)
-- Gauss says: **no map from ellipsoid to sphere is both conformal and equal-area** on any patch
-- So area and shape need *different* auxiliary spheres: authalic latitude for area, conformal latitude for shape
-- The difference is small: shape changes by at most ~0.2% between the two
-- Which surface your "shape" lives on is a modeling choice. I am leaving it open.
-
-::: {.notes}
-1 min. Don't get drawn into the debate. The theorem is the content; the
-rest is a choice the user makes, and csar is fine with either sphere.
-:::
-
-# Closing
-
-## Area is not the only design constraint
-
-- Equal area is a fine goal. It is **one** goal.
-- Shape, hierarchy, indexing, neighbor structure, ease of implementation...
-- Every DGGS picks a point in that space. There is no free lunch on a sphere.
-- Aspect ratio is one axis of that space. Now it is **cheap and exact** to measure.
-
-::: {.notes}
-1.5 min with the links slide. The message: use the tool to see the
-tradeoff you are already making.
+1 min. This is a work in progress and these are the questions I'd like
+help with. Sphere vs ellipsoid: measured on 400k cells, moving between
+authalic and conformal spheres changes AR by at most 0.22% and area by a
+0.67% spread; authalic keeps the equal-area grids exactly equal-area, so
+that's what the survey uses, but it is a choice. Extreme cells: H3 and
+ISEA have 12 pentagons, S2 has 8 cube corners, rHEALPix has polar caps;
+dggs_compare reports median, p99.95, and max side by side so you can see
+both the typical cell and the worst one. Resolution matching: the survey
+matches mean cell area (H3 r9, S2 L15, A5 r14, ISEA7H r10). Sampling:
+coarse levels are enumerated in full, fine ones are 1M point-drawn cells,
+which are size-biased unless weighted by 1/area, and the published plots
+are. Direction: the enclosing cone gives the axis for free; the AR globes
+show magnitude only. All of it is on the site, with the data as Parquet.
 :::
 
 ## Thanks

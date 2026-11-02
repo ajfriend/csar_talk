@@ -3,10 +3,8 @@
 default:
     @just --list
 
-# Render the deck into slides/_site/, from scratch: `preview` rewrites files
-# in _site that a later incremental render does not overwrite (the deck then
-# imports teec.js from a dead localhost URL and every demo is blank).
-render: clean
+# Render the deck into slides/_site/
+render:
     quarto render slides
 
 # Serve the rendered deck. ES modules and wasm need http, not file://.
@@ -19,20 +17,50 @@ show: render
     open slides/_site/index.html
 
 # Local csar_viz checkout, for previewing the demo slides against unmerged
-# csar_viz changes. The deck itself imports teec.js from this CDN path, a
-# csar_viz tag; bump the tag here and in slides/web/cellslide.js together.
+# csar_viz changes. The deck imports teec.js from a csar_viz tag on jsDelivr
+# (cellslide.js and globeslide.js, and offline.html's import map: bump all
+# three together); the recipes read it from cellslide.js.
 csar_viz := "../../csar_all/csar_viz"
-teec_cdn := "https://cdn.jsdelivr.net/gh/ajfriend/csar_viz@v0.1.0/"
+teec_cdn := `grep -o "https://cdn.jsdelivr.net/gh/ajfriend/csar_viz@[^/]*/" slides/web/cellslide.js`
+# the coastline base, read from the one place it lives
+ne_cdn := `grep -o "https://cdn.jsdelivr.net/gh/nvkelso/natural-earth-vector@[^/]*/geojson/" slides/web/globeslide.js`
 
-# Preview with the cone slide loading teec.js from the LOCAL csar_viz checkout. Ctrl-C stops the server.
+# Preview with the demo slides loading teec.js from the LOCAL csar_viz checkout.
+# Works on a copy of the render output, so `render`/`show` stay clean. Ctrl-C stops the server.
 preview: render
-    # Same origin as the deck (a symlink inside the render output), since a
+    rm -rf slides/_preview && cp -R slides/_site slides/_preview
+    # Same origin as the deck (a symlink inside the copy), since a
     # cross-origin module import needs CORS headers a dev server does not send.
-    ln -sfn "$(cd {{csar_viz}} && pwd)" slides/_site/csar_viz
-    sed -i '' 's|{{teec_cdn}}|http://localhost:8000/csar_viz/|g' slides/_site/web/*.js
+    ln -sfn "$(cd {{csar_viz}} && pwd)" slides/_preview/csar_viz
+    sed -i '' 's|{{teec_cdn}}|http://localhost:8000/csar_viz/|g' slides/_preview/web/*.js
     @echo "deck: http://localhost:8000/   (csar_viz from {{csar_viz}})"
     (sleep 0.5; open http://localhost:8000/) &
-    uv run --no-project -m http.server 8000 -d slides/_site --bind 127.0.0.1
+    uv run --no-project -m http.server 8000 -d slides/_preview --bind 127.0.0.1
+
+# The offline deck: `just vendor && just serve` works with wifi off. Downloads
+# everything the deck fetches from the network into slides/vendor/ (a cache;
+# gitignored; skipped when present), then renders with the offline profile
+# (slides/_quarto-offline.yml), which ships that directory and points every
+# fetch at it: an import map for the JS modules (slides/offline.html) and
+# Quarto's own MathJax option. No rendered file is edited. A later plain
+# `render` is online again. The globe data and ajglobe are always local.
+vendor: clean
+    #!/usr/bin/env sh
+    set -eu
+    v=slides/vendor
+    mkdir -p "$v/csar_viz/vendor" "$v/ne" "$v/mathjax"
+    # one curl, one connection: the demo library + its wasm pair, the coastlines
+    [ -f "$v/csar_viz/vendor/csar.wasm" ] || curl -sSfL \
+      "{{teec_cdn}}teec.js" -o "$v/csar_viz/teec.js" \
+      "{{teec_cdn}}vendor/csar.js" -o "$v/csar_viz/vendor/csar.js" \
+      "{{teec_cdn}}vendor/csar.wasm" -o "$v/csar_viz/vendor/csar.wasm" \
+      "{{ne_cdn}}ne_110m_coastline.geojson" -o "$v/ne/ne_110m_coastline.geojson"
+    # MathJax, pinned, from the npm tarball: the script and its whole font
+    # directory (it loads fonts lazily, so a hand-picked list would drift)
+    [ -f "$v/mathjax/tex-chtml-full.js" ] || curl -sSfL https://registry.npmjs.org/mathjax/-/mathjax-3.2.2.tgz \
+      | tar -xz -C "$v/mathjax" --strip-components=2 package/es5/tex-chtml-full.js package/es5/output/chtml/fonts/woff-v2
+    cd slides && quarto render --profile offline
+    echo "offline deck in slides/_site: just serve"
 
 # Run every figure/data script (writes slides/figs/ and slides/data/)
 figs:
@@ -40,8 +68,9 @@ figs:
 
 # Remove render output
 clean:
-    -rm -rf slides/_site slides/.quarto
+    -rm -rf slides/_site slides/_preview slides/.quarto
 
-# Also remove the Python env and downloaded data
+# Also remove the Python env, downloaded data, and the offline-deck downloads
+
 purge: clean
-    -rm -rf scripts/.venv scripts/raw
+    -rm -rf scripts/.venv scripts/raw slides/vendor

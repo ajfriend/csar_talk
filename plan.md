@@ -15,19 +15,20 @@ Slot: 25 minutes. Proposal text: `../proposals/ar.md`. Must mention H3.
 - **`uv` + `justfile`** manage the Python environment and every task
   (render, figs, serve, publish). No bare python; PEP 723 or `pyproject.toml`
   for deps.
-- **Interactive globes via ajglobe**, loaded from jsDelivr pinned to a
-  commit or tag (not vendored; not raw.githubusercontent.com, which serves
-  text/plain and breaks ES modules). Switch to the npm path once ajglobe
-  is published. Reuse `~/work/dggs_compare/web/globe.js` as the starting
-  point: it already draws per-cell AR heatmaps from the Parquet tables.
-  Globe pages live in `slides/web/` and read `slides/data/`.
+- **Interactive globes via ajglobe, vendored.** `slides/web/vendor/ajglobe.min.js`
+  (provenance beside it): dist/ is not committed upstream and the package is
+  not on npm. Globe data is the dggs_compare data release's own binaries,
+  fetched by `scripts/make_globes.py`. Superseded the earlier plan to iframe
+  the live site (2026-11-02).
 - **csar_viz only for the cone plot**, as a canvas mounted with its
-  `teec.js` library imported from jsDelivr at a csar_viz tag (v0.1.0 now; bump in
+  `teec.js` library imported from jsDelivr at a csar_viz tag (v0.1.3 now; bump in
   `slides/web/cellslide.js` and the justfile together). Optionally its `playground.html` for the 2D C(A, b)
   intuition slide.
-- **No vendoring by default.** A `just vendor` target exists as a day-of
-  safety net: it snapshots ajglobe and csar_viz into the local render
-  output for offline presenting on conference wifi.
+- **Online by default, offline on demand.** The deck imports the demo
+  library from jsDelivr at a csar_viz tag. `just vendor` downloads that,
+  the coastlines, and MathJax into `slides/vendor/` and renders with the
+  `offline` Quarto profile, which points every fetch at those copies;
+  verified with every request on localhost.
 - **One repo, published to GitHub Pages by a GitHub Actions workflow**
   on push to main. Render output is never committed. This replaces the
   prep-repo + rendered-repo pair used for h3c2p. The workflow only needs
@@ -140,9 +141,8 @@ Scope decisions, against the proposal (`../proposals/ar.md`):
 - **IPQ by the analytic response curve** (`scripts/make_ipq_curve.py`,
   numbers from `csar_paper/positioning-notes.md`), not per-cell IPQ.
   dggs_compare issue 90 (per-cell IPQ) stays open; not needed for the talk.
-- **Globes are the live dggs_compare site, iframed** as a slide
-  background. No talk-owned globe pages (G1/G2 in the inventory are
-  dropped). Needs a screenshot fallback slide for bad wifi.
+- ~~Globes iframed from the live site.~~ Superseded: local ajglobe globes
+  (see the decisions above).
 - **Survey figures are copied from dggs_compare/out** (histograms,
   area_histograms, tradeoff). Four systems in the headline figures;
   IVEA7H and rHEALPix only on the site. Per-resolution plots cut: AR is
@@ -150,7 +150,8 @@ Scope decisions, against the proposal (`../proposals/ar.md`):
 - Convex optimization is two slides: global optimum + certificate (with
   the declarative/agents point as one spoken sentence), then the software.
 
-Budget (25-minute slot; minute targets also in the speaker notes):
+Budget as first drafted (superseded: the live budget is the table in
+`beats.md`; minute targets are in the speaker notes):
 
 | section | slides | min |
 |---|---|---|
@@ -170,19 +171,23 @@ Still to do before the talk:
 
 1. ~~Merge and deploy csar_viz `close-zoom`.~~ Done 2026-11-02 (PR #8 there);
    the hosted teec.js now has `view.fit` and the 1.02 floor; csar_viz is
-   tagged v0.1.0 and the deck imports that tag via jsDelivr.
-2. Screenshot of the globes tab for the fallback slide.
-3. A figure for "why squish matters" (k-ring on a round vs squished cell),
-   or keep it text.
-4. IVEA7H and rHEALPix rows in the summary table, from the site.
+   tagged v0.1.3 (hull-lift fix, outline overlay, synced cameras, points toggle) and the deck imports that
+   tag via jsDelivr.
+2. ~~Screenshot of the globes tab for the fallback slide.~~ Moot: the globe
+   slides now draw from local data (`scripts/make_globes.py`, ajglobe
+   vendored); only the coastlines come from a CDN, and they fail soft.
+3. ~~A figure for "why squish matters".~~ Done: the neighbours cartoon
+   (`scripts/make_neighbors.py`). A k-ring version was built and dropped
+   (`scripts/make_kring.py` records why).
+4. ~~IVEA7H and rHEALPix rows in the summary table.~~ Done; both have globes too.
 5. Native per-cell timing line on the software slide (csar_zig/bench).
-6. dggs_compare `?embed` mode so the iframed globes sit above the fold.
-7. Pages workflow, `just vendor`, slides URL on the thanks slide.
+6. ~~dggs_compare `?embed` mode.~~ Moot: no iframe; see 2.
+7. Pages workflow and the slides URL on the thanks slide.
 8. Timed run-through; cut S2-round and section-title slides first if long.
 
 ## Embedding notes
 
-- Iframes with `data-preload` on globe slides so WebGL and wasm are warm.
+- ~~Iframes with `data-preload` on globe slides.~~ No iframes remain.
 - Iframe steals keyboard focus after interaction. Add the click-outside or
   Escape handler used in h3c2p, or a visible "back to slides" affordance.
 - Every interactive slide gets a static PNG fallback slide right after it,
