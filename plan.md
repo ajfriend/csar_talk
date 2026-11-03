@@ -24,11 +24,13 @@ Slot: 25 minutes. Proposal text: `../proposals/ar.md`. Must mention H3.
   `teec.js` library imported from jsDelivr at a csar_viz tag (v0.1.5 now; bump in
   `slides/web/cellslide.js` and the justfile together). Optionally its `playground.html` for the 2D C(A, b)
   intuition slide.
-- **Online by default, offline on demand.** The deck imports the demo
-  library from jsDelivr at a csar_viz tag. `just vendor` downloads that,
-  the coastlines, and MathJax into `slides/vendor/` and renders with the
-  `offline` Quarto profile, which points every fetch at those copies;
-  verified with every request on localhost.
+- **One self-contained build.** The deck's JS imports the demo library
+  from jsDelivr at a csar_viz tag, but `just render` first downloads that,
+  the coastlines, and MathJax into `slides/vendor/` and an import map
+  points every fetch at those copies, so the same build works online and
+  off (verified with every request on localhost). The Pages workflow runs
+  the same recipe. An earlier online/offline split (two builds into one
+  folder, whichever ran last) was folded into this on 2026-11-03.
 - **One repo, published to GitHub Pages by a GitHub Actions workflow**
   on push to main. Render output is never committed. This replaces the
   prep-repo + rendered-repo pair used for h3c2p. The workflow only needs
@@ -79,8 +81,8 @@ All run from the repo root; Python targets `cd scripts` and use `uv run`.
 - `data`: fetch dggs_compare Parquet releases into `scripts/raw/`
 - `figs`: run every `scripts/make_*.py`; static plots to `slides/figs/`,
   globe data to `slides/data/`
-- `vendor`: optional, day-of only: snapshot ajglobe and csar_viz into
-  `slides/_site/` and rewrite the links, so the deck runs offline
+- `fetch`: download the vendored libraries into `slides/vendor/` (run by
+  `render`)
 - `pdf`: reveal.js print-to-PDF via decktape or Chrome, for the handout
 - `publish`: just `git push`; the Pages workflow renders and deploys
 - `clean` / `purge`

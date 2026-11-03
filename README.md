@@ -21,13 +21,15 @@ Slides for a FOSS4G NA 2026 talk, by AJ Friend.
 Needs [Quarto](https://quarto.org), [just](https://just.systems), and [uv](https://docs.astral.sh/uv/).
 
 ```sh
-just render   # slides/_site/
+just render   # slides/_site/, self-contained: works with wifi off
 just serve    # http://localhost:8000/ (ES modules and wasm need http)
-just vendor   # an offline build: every network fetch served locally
 just figs     # regenerate every figure and data file
 ```
 
-Pushing to `main` renders and deploys the deck to GitHub Pages.
+The render first downloads the demo library, coastlines, and MathJax into
+`slides/vendor/` (a cache) and serves them from there, so the built deck
+has no network dependency. Pushing to `main` renders and deploys it to
+GitHub Pages the same way.
 
 ## Licence
 

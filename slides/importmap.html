@@ -1,0 +1,10 @@
+<!-- The import map: the CDN bases web/*.js import from (and resolve fetch
+     URLs through, via import.meta.resolve) become the copies in vendor/,
+     which `just render` fills. The keys must match the URLs in web/*.js
+     exactly; bump them with the pins there. -->
+<script type="importmap">
+{"imports": {
+  "https://cdn.jsdelivr.net/gh/ajfriend/csar_viz@v0.1.5/": "./vendor/csar_viz/",
+  "https://cdn.jsdelivr.net/gh/nvkelso/natural-earth-vector@v5.1.2/geojson/": "./vendor/ne/"
+}}
+</script>

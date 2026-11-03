@@ -1,6 +1,6 @@
-# Render the deck with Quarto and publish it to GitHub Pages on every push to
-# main. The deck runs no code at render time (every figure and data file is
-# prerendered and committed), so Quarto is all the job needs.
+# Render the deck and publish it to GitHub Pages on every push to main. The
+# deck runs no code at render time (every figure and data file is prerendered
+# and committed); `just render` downloads the vendored libraries and renders.
 name: Publish the talk
 
 on:
@@ -25,7 +25,8 @@ jobs:
       - uses: quarto-dev/quarto-actions/setup@v2
         with:
           version: 1.5.57
-      - run: quarto render slides
+      - uses: extractions/setup-just@v4
+      - run: just render
       - uses: actions/upload-pages-artifact@v3
         with:
           path: slides/_site

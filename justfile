@@ -3,8 +3,14 @@
 default:
     @just --list
 
+# Self-contained: everything the deck fetches from the network is first
+# downloaded into slides/vendor/ (a cache, gitignored) and served from there
+# through the import map, so the same build works with wifi off. The Pages
+# workflow runs this too.
+#
 # Render the deck into slides/_site/
-render:
+render: fetch
+    rm -rf slides/_site/vendor
     quarto render slides
 
 # Serve the rendered deck. ES modules and wasm need http, not file://.
@@ -18,8 +24,8 @@ show: render
 
 # Local csar_viz checkout, for previewing the demo slides against unmerged
 # csar_viz changes. The deck imports teec.js from a csar_viz tag on jsDelivr
-# (cellslide.js and globeslide.js, and offline.html's import map: bump all
-# three together); the recipes read it from cellslide.js.
+# (cellslide.js, globeslide.js, countryslide.js, and importmap.html: bump
+# them together); the recipes read it from cellslide.js.
 csar_viz := "../../csar_all/csar_viz"
 teec_cdn := `grep -o "https://cdn.jsdelivr.net/gh/ajfriend/csar_viz@[^/]*/" slides/web/cellslide.js`
 # the coastline base, read from the one place it lives
@@ -37,30 +43,28 @@ preview: render
     (sleep 0.5; open http://localhost:8000/) &
     uv run --no-project -m http.server 8000 -d slides/_preview --bind 127.0.0.1
 
-# The offline deck: `just vendor && just serve` works with wifi off. Downloads
-# everything the deck fetches from the network into slides/vendor/ (a cache;
-# gitignored; skipped when present), then renders with the offline profile
-# (slides/_quarto-offline.yml), which ships that directory and points every
-# fetch at it: an import map for the JS modules (slides/offline.html) and
-# Quarto's own MathJax option. No rendered file is edited. A later plain
-# `render` is online again. The globe data and ajglobe are always local.
-vendor: clean
+# The demo library with its wasm pair (refetched when the pin in cellslide.js
+# changes), the coastlines, and MathJax. Skipped when present.
+#
+# Download what the deck fetches from the network into slides/vendor/
+fetch:
     #!/usr/bin/env sh
     set -eu
     v=slides/vendor
-    mkdir -p "$v/csar_viz/vendor" "$v/ne" "$v/mathjax"
-    # one curl, one connection: the demo library + its wasm pair, the coastlines
-    [ -f "$v/csar_viz/vendor/csar.wasm" ] || curl -sSfL \
-      "{{teec_cdn}}teec.js" -o "$v/csar_viz/teec.js" \
-      "{{teec_cdn}}vendor/csar.js" -o "$v/csar_viz/vendor/csar.js" \
-      "{{teec_cdn}}vendor/csar.wasm" -o "$v/csar_viz/vendor/csar.wasm" \
-      "{{ne_cdn}}ne_110m_coastline.geojson" -o "$v/ne/ne_110m_coastline.geojson"
+    mkdir -p "$v/ne" "$v/mathjax"
+    [ "$(cat "$v/csar_viz/TAG" 2>/dev/null)" = "{{teec_cdn}}" ] || {
+      rm -rf "$v/csar_viz" && mkdir -p "$v/csar_viz/vendor"
+      curl -sSfL \
+        "{{teec_cdn}}teec.js" -o "$v/csar_viz/teec.js" \
+        "{{teec_cdn}}vendor/csar.js" -o "$v/csar_viz/vendor/csar.js" \
+        "{{teec_cdn}}vendor/csar.wasm" -o "$v/csar_viz/vendor/csar.wasm"
+      echo "{{teec_cdn}}" > "$v/csar_viz/TAG"
+    }
+    [ -f "$v/ne/ne_110m_coastline.geojson" ] || curl -sSfL "{{ne_cdn}}ne_110m_coastline.geojson" -o "$v/ne/ne_110m_coastline.geojson"
     # MathJax, pinned, from the npm tarball: the script and its whole font
     # directory (it loads fonts lazily, so a hand-picked list would drift)
     [ -f "$v/mathjax/tex-chtml-full.js" ] || curl -sSfL https://registry.npmjs.org/mathjax/-/mathjax-3.2.2.tgz \
       | tar -xz -C "$v/mathjax" --strip-components=2 package/es5/tex-chtml-full.js package/es5/output/chtml/fonts/woff-v2
-    cd slides && quarto render --profile offline
-    echo "offline deck in slides/_site: just serve"
 
 # Run every figure/data script (writes slides/figs/ and slides/data/)
 figs:
@@ -70,7 +74,7 @@ figs:
 clean:
     -rm -rf slides/_site slides/_preview slides/.quarto
 
-# Also remove the Python env, downloaded data, and the offline-deck downloads
+# Also remove the Python env, downloaded data, and the vendor cache
 
 purge: clean
     -rm -rf scripts/.venv scripts/raw slides/vendor
