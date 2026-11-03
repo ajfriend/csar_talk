@@ -50,11 +50,34 @@ shape on screen is true to the sphere. The squish is the grid's. And the
 metric we get to never projects anything at all.
 :::
 
-## Why shape matters
+## Sphere-native
 
-- one cell, one value, for every point inside it
-- so points in a cell should be close together
-- stretched cell: points far apart in one direction
+That's the last time we'll mention a planar projection.
+
+- rest of the talk: on the sphere, natively
+  - no projection distortion, no center to choose
+- grids defined on WGS84 ellipsoid: map to sphere first
+  - for shape, difference is small; discussion at end
+- math is cleaner
+
+::: {.notes}
+Half a minute. The one modeling decision, stated once, and the last
+time this talk mentions a projection. Grids defined on WGS84 are mapped
+to the sphere by an auxiliary latitude before measuring (authalic, which
+keeps the equal-area grids exactly equal-area). The sphere-vs-WGS84
+effect, measured on 400k cells (dggs_compare #89): AR changes by at most
+0.22% (worst at the equator), area by a 0.67% spread. No grid is anywhere
+near conformal (best worst-case AR ~1.21), so 0.22% is invisible against
+every grid's own stretch. Cells are spherical polygons with great-circle
+edges, and both metrics are computed on that object with no projection
+anywhere.
+:::
+
+## Why shape/squish/stretch matters
+
+- a cell represents all the points inside it
+- points in a cell should be (relatively) close together
+- stretched cell: points farther apart in some direction
 
 <!-- figure: scripts/make_neighbors.py -->
 ![](figs/neighbors.png){width="100%"}
@@ -77,37 +100,16 @@ cell are as close to each other as possible, thus taking advantage of
 Tobler's first law of geography." (p. 273)
 :::
 
-## Everything on the sphere
+## Two ways to measure shape {.smaller}
 
-One arena for every grid, sphere-defined or WGS84-defined.
-
-- **plane**: no. Every projection distorts shape.
-- **WGS84**: no. Much harder math, for a ~0.2% correction.
-- **sphere**: yes. Exact to floating point; every grid can be brought to it.
-
-::: {.fine}
-Every picture here is a zoomed-in patch of the sphere: at cell scale, flat and spherical agree. Every number is computed on the sphere.
-:::
-
-::: {.notes}
-Half a minute. The one modeling decision, stated once. Grids defined on
-WGS84 are mapped to the sphere by an auxiliary latitude before measuring
-(authalic, which keeps the equal-area grids exactly equal-area). The
-sphere-vs-WGS84 effect, measured on 400k cells (dggs_compare #89): AR
-changes by at most 0.22% (worst at the equator), area by a 0.67% spread.
-No grid is anywhere near conformal (best worst-case AR ~1.21), so 0.22%
-is invisible against every grid's own stretch. Cells are
-spherical polygons with great-circle edges, and both metrics are computed
-on that object with no projection anywhere.
-:::
-
-## Options to measure shape
-
-1. **compactness**, the standard: how close to a circle
-   - IPQ: perimeter of the cap with the same area ÷ perimeter of the shape, squared
-   - 1 for a cap, smaller for everything else
-2. **aspect ratio**, this talk: how stretched
-   - defined next
+1. **isoperimetric quotient (IPQ)**
+   - $\text{IPQ} = \left( \dfrac{\text{perimeter of the circle with the same area}}{\text{perimeter of the shape}} \right)^2$
+   - "how close is this polygon to a circle?"
+   - $\text{IPQ} \le 1$
+2. **conic spherical aspect ratio (CSAR)**
+   - "how stretched is this shape?"
+   - this talk; definition later, but **will match your intuition**
+   - $\text{CSAR} \ge 1$
 
 ::: {.notes}
 Under a minute. Two ways to put a number on shape. Compactness is what the
@@ -130,20 +132,22 @@ million, but every number on them is computed on the sphere.
      library as the cell slides (points + numbers from scripts/make_stretch.py
      via slides/data/shapes.js; captions filled in by web/cellslide.js).
      data-dist on the .pair: one camera distance for every shape, so a 1.5x
-     stretch looks 1.5x wider. -->
+     stretch looks 1.5x wider. The whole sphere fits the canvas only for
+     dist >= ~2.51 (teec draws it 2*1.15/sqrt(dist^2-1) of the short side),
+     so 2.4 clips the poles. -->
 
-## Isn't compactness enough? {#ipq-square}
+## Is IPQ enough? {#ipq-square}
 
 ```{=html}
-<div class="pair" data-dist="2.4">
-  <div><canvas class="stage" data-cell="square" data-show="hull,rim" data-nums></canvas></div>
-  <div><canvas class="stage" data-cell="square_stretched" data-show="hull,rim" data-nums></canvas></div>
+<div class="pair" data-dist="2.7">
+  <div><canvas class="stage" data-cell="square" data-show="hull" data-nums></canvas></div>
+  <div><canvas class="stage" data-cell="square_stretched" data-show="hull" data-nums></canvas></div>
 </div>
 ```
 
 ::: {.point}
-Stretch a square 1.5x. Aspect ratio reads 1.5: the stretch you applied.<br>
-**When you say a cell is squished, this is the number you mean.**
+A spherical square has CSAR 1.0. Stretch by 1.5x and CSAR matches.<br>
+CSAR is *natural*.
 :::
 
 ::: {.notes}
@@ -153,17 +157,18 @@ direction, to a number nobody could have predicted. Both shapes are a few
 degrees across, on the sphere, with their enclosing ellipses solved live.
 :::
 
-## Isn't compactness enough? {#ipq-class}
+## Is IPQ enough? {#ipq-class}
 
 ```{=html}
-<div class="pair" data-dist="2.4">
-  <div><canvas class="stage" data-cell="square" data-show="hull,rim" data-nums></canvas></div>
-  <div><canvas class="stage" data-cell="hexagon" data-show="hull,rim" data-nums></canvas></div>
+<div class="pair" data-dist="2.7">
+  <div><canvas class="stage" data-cell="square" data-show="hull" data-nums></canvas></div>
+  <div><canvas class="stage" data-cell="hexagon" data-show="hull" data-nums></canvas></div>
 </div>
 ```
 
 ::: {.point}
-Neither is stretched. Compactness already differs: it scores the polygon, not the stretch.
+Two *regular* shapes: different IPQ, same CSAR.<br>
+IPQ responds to boundary and stretch. CSAR only measures stretch.
 :::
 
 ::: {.notes}
@@ -173,17 +178,18 @@ ratio says 1 for both: nothing to undo. Comparing H3 to S2 on compactness
 is mostly comparing hexagons to squares.
 :::
 
-## Isn't compactness enough? {#ipq-hexagon}
+## Is IPQ enough? {#ipq-hexagon}
 
 ```{=html}
-<div class="pair" data-dist="2.4">
-  <div><canvas class="stage" data-cell="hexagon" data-show="hull,rim" data-nums></canvas></div>
-  <div><canvas class="stage" data-cell="hexagon_stretched" data-show="hull,rim" data-nums></canvas></div>
+<div class="pair" data-dist="2.7">
+  <div><canvas class="stage" data-cell="hexagon" data-show="hull" data-nums></canvas></div>
+  <div><canvas class="stage" data-cell="hexagon_stretched" data-show="hull" data-nums></canvas></div>
 </div>
 ```
 
 ::: {.point}
-Same stretch, same 1.5. Compactness depends on the shape you started with.
+Stretch regular hexagon by 1.5x.<br>
+IPQ depends on the shape you started with. CSAR measures the stretch.
 :::
 
 ::: {.notes}
@@ -200,18 +206,25 @@ stretch of the gnomonic coordinates, the one stretch that maps cones to
 cones, so AR scales by exactly the factor at any size (checked to 50°).
 :::
 
-## Isn't compactness enough? {#ipq-star}
+## Is IPQ enough? {#ipq-star}
 
+:::: {.r-hstack}
+
+::: {style="width: 50%"}
 ```{=html}
-<div class="pair" data-dist="2.4">
-  <div><canvas class="stage" data-cell="star" data-show="outline,rim" data-nums></canvas></div>
+<div class="pair" data-dist="2.7">
+  <div><canvas class="stage" data-cell="star" data-show="outline" data-nums></canvas></div>
 </div>
 ```
-
-::: {.point}
-Complementary: the star is round by aspect ratio, and badly compact.<br>
-Compactness sees the boundary. Aspect ratio sees only stretch.
 :::
+
+::: {.point style="width: 50%"}
+- IPQ and CSAR are **complementary**
+- IPQ measures boundary roughness and stretch
+- CSAR isolates stretch
+:::
+
+::::
 
 ::: {.notes}
 The foil in the other direction: by symmetry its enclosing ellipse is a
@@ -219,7 +232,7 @@ circle, so AR is 1; its perimeter is enormous, so IPQ collapses. Two
 instruments, two questions. This talk is about the second one.
 :::
 
-# A spherical aspect ratio
+# CSAR: Conic spherical aspect ratio
 
 ## The idea {.smaller}
 

@@ -15,8 +15,9 @@
 //                         set has one, and AR), from the same data as the points
 //   data-edit             the points can be dragged
 // On the canvas or any ancestor:
-//   data-dist="2.4"       a fixed camera distance instead of fitting the rim,
-//                         so shapes compared across canvases share one scale
+//   data-dist="2.7"       a fixed camera distance instead of fitting the rim,
+//                         so shapes compared across canvases share one scale;
+//                         it is authored, so scroll-zoom is off
 // Canvases on one slide share a camera: spin either and both turn.
 import { mount } from 'https://cdn.jsdelivr.net/gh/ajfriend/csar_viz@v0.1.3/teec.js';
 import { cells } from '../data/cells.js';
@@ -37,7 +38,7 @@ for (const cv of document.querySelectorAll('canvas[data-cell]')) {
     points: set.points,
     view: { center: 'axis', ...(dist ? { dist: Number(dist) } : { fit: 0.45 }) },
     show: showSpec(d.show ?? 'hull,rim,points'),
-    interaction: { edit: 'edit' in d },
+    interaction: { edit: 'edit' in d, zoom: !dist },
     // onView fires only on user input, and setView does not fire it, so
     // mirroring one camera onto the slide's other canvases cannot loop.
     onView: view => {
@@ -48,7 +49,7 @@ for (const cv of document.querySelectorAll('canvas[data-cell]')) {
   if ('nums' in d) {
     const p = document.createElement('p');
     p.className = 'nums';
-    p.textContent = (set.ipq != null ? `IPQ ${set.ipq.toFixed(3)}   ` : '') + `AR ${set.ar.toFixed(2)}`;
+    p.textContent = (set.ipq != null ? `IPQ ${set.ipq.toFixed(3)}   ` : '') + `CSAR ${set.ar.toFixed(2)}`;
     cv.after(p);
   }
 }

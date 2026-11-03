@@ -16,15 +16,16 @@
   display: block;
   width: 100%;
 }
+/* keys steer a focused canvas; no focus ring around it */
+canvas:focus { outline: none; }
 
-/* Live canvases side by side (or one, centred), each with a caption under it */
+/* Live canvases side by side, each with a caption under it */
 .pair { display: flex; gap: 2%; width: 100%; }
 .pair > div { flex: 1; min-width: 0; text-align: center; }
-.pair > div:only-child { flex: 0 0 60%; margin: 0 auto; }
-.pair canvas.stage { height: 400px; }
+.pair canvas.stage { height: 430px; }
 .nums { font-family: ui-monospace, Menlo, monospace; font-size: 0.75em; margin: 0.2em 0 0 0; color: #333; }
 
-/* the one-line point under a comparison */
+/* the point under, or beside, a comparison */
 .point { font-size: 0.8em; margin-top: 0.6em; }
 /* footnotes, citations, asides */
 .fine { font-size: 0.55em; color: #666; }
