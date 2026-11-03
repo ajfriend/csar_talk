@@ -234,43 +234,54 @@ instruments, two questions. This talk is about the second one.
 
 # CSAR: Conic spherical aspect ratio
 
-## The idea {.smaller}
+## Conic spherical aspect ratio
 
-:::: {.columns}
+:::: {.r-hstack}
 
-::: {.column width="56%"}
-Given a cell's corner points on the sphere:
-
-1. **tightest elliptical cone**, apex at the center, containing them
-2. its rim: an ellipse on the sphere, tight around the corners
-3. $\text{AR} = \dfrac{\text{long axis}}{\text{short axis}} \ge 1$
-
-1 is round. Bigger is more stretched.
+::: {style="width: 55%"}
+```{=html}
+<div class="pair"><div>
+<canvas id="cone" class="stage" aria-label="Tightest enclosing ellipsoidal cone, interactive"></canvas>
+<p class="nums" id="cone-nums"></p>
+</div></div>
+<script type="module">
+  import { mount } from './web/cellslide.js';
+  const nums = document.getElementById('cone-nums');
+  mount(document.getElementById('cone'), {
+    points: [[-20, 40], [-5, 48], [10, 50], [25, 46], [35, 38], [20, 30], [5, 28], [-10, 31]],
+    view: { center: 'axis', dist: 2.7 },
+    show: { sphere: true, hull: true, axes: true, axis: false },
+    onSolve: sol => { nums.textContent = sol.ok ? `CSAR ${sol.aspect.toFixed(2)}` : ''; },
+  });
+</script>
+```
 :::
 
-::: {.column width="44%"}
-**Properties**
-
-- input: corner points only
-- no projection, no center to choose
-- works everywhere: no poles, no antimeridian
-- one answer: convex, so unique, with a certificate
-- scale-free: proportion, not size
+::: {.point style="width: 45%"}
+- **input**: the vertices of a polygon, on the sphere
+- find the "smallest" *ellipsoidal cone* that contains them
+- **CSAR**: ratio of the axes of the (cross section) ellipse
 :::
 
 ::::
 
 ::: {.notes}
-4 min for definition + demo. Why a cone and not an ellipse in some map
-projection? Because the cone lives in 3D with the sphere and needs no
-projection, no centroid, no tangent plane chosen by hand. The optimum
-picks the axis. The properties are what separate this from the obvious
-alternatives: nothing is chosen by hand, the answer is unique and
-checkable, and the same cell scores the same at any size. "Works
-everywhere" is a consequence of taking unit vectors: a cell at the pole
-or straddling 180° is just points on a sphere, nothing special about it.
-Any per-cell projection pipeline has to special-case those seams; this
-never meets them. Say it as a feature, not a critique.
+4 min for definition + demo + math. THE demo, on the left. Drag a point
+outward: the cone and the rim follow, CSAR goes up. Drag it back in: a
+point inside the hull stops mattering, only the points on the rim are
+active. Shift-click adds a point, double-click removes one. Every drag
+re-solves from scratch in the browser in about 3 ms, with the real solver
+compiled to WebAssembly.
+
+Why a cone and not an ellipse in some map projection? Because the cone
+lives in 3D with the sphere and needs no projection, no centroid, no
+tangent plane chosen by hand. The optimum picks the axis. Properties
+worth saying out loud: input is corner points only; no projection, no
+center to choose; works everywhere (a cell at the pole or straddling 180°
+is just points on a sphere; any per-cell projection pipeline has to
+special-case those seams, this never meets them: say it as a feature,
+not a critique); one answer, convex, so unique, with a certificate;
+scale-free, a proportion, not a size.
 :::
 
 ## Tightest Enclosing Ellipsoidal Cone
@@ -294,28 +305,6 @@ with
 One slide of math, for the people who want it. The cone is the set of x
 with ||Ax|| <= b'x. Minimizing -log det A makes it as tight as possible.
 Everyone else: it is "smallest cone that fits".
-:::
-
-## {#cone-demo background-interactive="true"}
-
-```{=html}
-<canvas id="cone" class="fullscreen" aria-label="Tightest enclosing ellipsoidal cone, interactive"></canvas>
-<script type="module">
-  import { mount } from './web/cellslide.js';
-  mount(document.getElementById('cone'), {
-    points: [[-20, 40], [-5, 48], [10, 50], [25, 46], [35, 38], [20, 30], [5, 28], [-10, 31]],
-    view: { center: 'axis', dist: 2.7 },
-    show: { sphere: true, hull: true },
-  });
-</script>
-```
-
-::: {.notes}
-THE demo. Drag a point outward: the cone and the rim follow, AR goes up.
-Drag it back in: a point inside the hull stops mattering. Shift-click adds
-a point, double-click removes one. Every drag re-solves from scratch in
-the browser in about 3 ms, with the real solver compiled to WebAssembly.
-Budget 2 min here and no more.
 :::
 
 # The same cells, measured

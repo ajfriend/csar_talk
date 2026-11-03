@@ -19,7 +19,7 @@
 //                         so shapes compared across canvases share one scale;
 //                         it is authored, so scroll-zoom is off
 // Canvases on one slide share a camera: spin either and both turn.
-import { mount } from 'https://cdn.jsdelivr.net/gh/ajfriend/csar_viz@v0.1.3/teec.js';
+import { mount } from 'https://cdn.jsdelivr.net/gh/ajfriend/csar_viz@v0.1.4/teec.js';
 import { cells } from '../data/cells.js';
 import { shapes } from '../data/shapes.js';
 
