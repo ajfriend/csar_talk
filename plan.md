@@ -21,7 +21,7 @@ Slot: 25 minutes. Proposal text: `../proposals/ar.md`. Must mention H3.
   fetched by `scripts/make_globes.py`. Superseded the earlier plan to iframe
   the live site (2026-11-02).
 - **csar_viz only for the cone plot**, as a canvas mounted with its
-  `teec.js` library imported from jsDelivr at a csar_viz tag (v0.1.4 now; bump in
+  `teec.js` library imported from jsDelivr at a csar_viz tag (v0.1.5 now; bump in
   `slides/web/cellslide.js` and the justfile together). Optionally its `playground.html` for the 2D C(A, b)
   intuition slide.
 - **Online by default, offline on demand.** The deck imports the demo
@@ -171,7 +171,7 @@ Still to do before the talk:
 
 1. ~~Merge and deploy csar_viz `close-zoom`.~~ Done 2026-11-02 (PR #8 there);
    the hosted teec.js now has `view.fit` and the 1.02 floor; csar_viz is
-   tagged v0.1.4 (hull-lift fix, outline overlay, synced cameras, points toggle, ellipse axes) and the deck imports that
+   tagged v0.1.5 (hull-lift fix, outline overlay, synced cameras, points toggle, ellipse axes) and the deck imports that
    tag via jsDelivr.
 2. ~~Screenshot of the globes tab for the fallback slide.~~ Moot: the globe
    slides now draw from local data (`scripts/make_globes.py`, ajglobe

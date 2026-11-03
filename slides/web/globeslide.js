@@ -25,8 +25,8 @@ import { globes } from '../data/globes.js';
 // slide, memoised, and checks the csar.js / csar.wasm pair match) and the
 // ABI's solve. Both come from the same tag as cellslide.js's import; the
 // offline profile's import map (offline.html) remaps that base.
-import { load as csarLoad } from 'https://cdn.jsdelivr.net/gh/ajfriend/csar_viz@v0.1.4/teec.js';
-import { solve as csarSolve } from 'https://cdn.jsdelivr.net/gh/ajfriend/csar_viz@v0.1.4/vendor/csar.js';
+import { load as csarLoad } from 'https://cdn.jsdelivr.net/gh/ajfriend/csar_viz@v0.1.5/teec.js';
+import { solve as csarSolve } from 'https://cdn.jsdelivr.net/gh/ajfriend/csar_viz@v0.1.5/vendor/csar.js';
 
 // Natural Earth coastlines, fetched once for all the globes. Resolved
 // through the import map so the offline profile serves the vendored copy.
