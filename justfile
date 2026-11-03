@@ -7,6 +7,8 @@ default:
 # downloaded into slides/vendor/ (a cache, gitignored) and served from there
 # through the import map, so the same build works with wifi off. The Pages
 # workflow runs this too.
+# Quarto copies vendor/ into _site/ but never prunes it, so files dropped
+# from the cache (an old MathJax font set, say) would linger: sweep first.
 #
 # Render the deck into slides/_site/
 render: fetch

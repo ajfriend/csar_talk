@@ -4,7 +4,7 @@ subtitle: "A Spherical Aspect Ratio"
 author:
   - name: AJ Friend
     affiliation: Waymo Data Science
-# format options are in _quarto.yml, so the offline profile can override them
+# format options are in _quarto.yml
 ---
 
 ## About

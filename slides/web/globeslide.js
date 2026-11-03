@@ -24,12 +24,12 @@ import { globes } from '../data/globes.js';
 // The solver: csar_viz's loader (it also fetches the wasm for the cone
 // slide, memoised, and checks the csar.js / csar.wasm pair match) and the
 // ABI's solve. Both come from the same tag as cellslide.js's import; the
-// offline profile's import map (offline.html) remaps that base.
+// import map (importmap.html) remaps that base.
 import { load as csarLoad } from 'https://cdn.jsdelivr.net/gh/ajfriend/csar_viz@v0.1.5/teec.js';
 import { solve as csarSolve } from 'https://cdn.jsdelivr.net/gh/ajfriend/csar_viz@v0.1.5/vendor/csar.js';
 
 // Natural Earth coastlines, fetched once for all the globes. Resolved
-// through the import map so the offline profile serves the vendored copy.
+// through the import map, which serves the vendored copy.
 const NE = import.meta.resolve('https://cdn.jsdelivr.net/gh/nvkelso/natural-earth-vector@v5.1.2/geojson/ne_110m_coastline.geojson');
 export const coast = fetch(NE).then(r => r.json()).then(geojsonLines).catch(() => null);
 const TAU = 2 / 3;   // 1 - sigma_0^2: the cross-section's size on the plane b.x = 1

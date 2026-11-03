@@ -11,7 +11,8 @@ GeoJSON rings are planar objects and need two repairs before a sphere can
 read them. (1) The antimeridian cut: Antarctica's ring runs along latitude
 -90 and up both sides of lng ±180; on the sphere those edges collapse to
 one point and a doubled seam, so the pole points go and the seam
-duplicates merge, leaving the coastline loop. (2) Winding: the globe
+duplicates merge, leaving the coastline loop (the same merge drops the
+repeated consecutive vertices some thirty other rings carry). (2) Winding: the globe
 trusts it (CCW seen from outside encloses the ring's small side, CW the
 rest of the sphere), Natural Earth writes outer rings CW, and a planar
 shoelace cannot read a loop around a pole, so orientation is measured on

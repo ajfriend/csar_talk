@@ -33,7 +33,6 @@ const solver = csarLoad().catch(() => null);
 for (const cv of document.querySelectorAll('canvas[data-countries]')) {
   const orb = new Orb(cv, { background: '#ffffff', sphere: '#e9ebf0', interaction: { keys: true } });
   orb.lookAt(...LOOK_AT);
-  cv.orb = orb;
 
   const hud = document.createElement('div');
   hud.className = 'globe-hud';
@@ -67,15 +66,12 @@ for (const cv of document.querySelectorAll('canvas[data-countries]')) {
     const pts = [];
     for (const poly of countries[picked].polys) for (const ring of poly) for (const [lng, lat] of ring) pts.push(...lnglatToVec3(lng, lat));
     let r = null;
-    try { r = csarSolve(pts); } catch { r = null; }
-    ellipse?.remove(); ellipse = null;
+    try { r = csarSolve(pts); } catch {}
+    const ok = r?.status === 'converged';
+    ellipse?.remove();
+    ellipse = ok ? orb.lines({ xyz: rim(r), starts: new Uint32Array([0, 181]), color: MARK, width: 3 }) : null;
     vName.textContent = countries[picked].name;
-    if (r && r.status === 'converged') {
-      ellipse = orb.lines({ xyz: rim(r), starts: new Uint32Array([0, 181]), color: MARK, width: 3 });
-      vAr.textContent = r.aspectRatio.toFixed(2);
-    } else {
-      vAr.textContent = 'no hemisphere holds it';
-    }
+    vAr.textContent = ok ? r.aspectRatio.toFixed(2) : 'no hemisphere holds it';
   });
 
   coast.then(lines => { if (lines) orb.lines({ ...lines, color: '#64748b', width: 1 }); });

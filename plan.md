@@ -21,8 +21,9 @@ Slot: 25 minutes. Proposal text: `../proposals/ar.md`. Must mention H3.
   fetched by `scripts/make_globes.py`. Superseded the earlier plan to iframe
   the live site (2026-11-02).
 - **csar_viz only for the cone plot**, as a canvas mounted with its
-  `teec.js` library imported from jsDelivr at a csar_viz tag (v0.1.5 now; bump in
-  `slides/web/cellslide.js` and the justfile together). Optionally its `playground.html` for the 2D C(A, b)
+  `teec.js` library imported from jsDelivr at a csar_viz tag (v0.1.5 now; bump
+  the pins in cellslide.js, globeslide.js, countryslide.js, and importmap.html
+  together; the justfile reads its copy from cellslide.js). Optionally its `playground.html` for the 2D C(A, b)
   intuition slide.
 - **One self-contained build.** The deck's JS imports the demo library
   from jsDelivr at a csar_viz tag, but `just render` first downloads that,
