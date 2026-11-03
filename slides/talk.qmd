@@ -457,6 +457,7 @@ are already making.
 - **sphere vs. ellipsoid**
   - how to fairly compare systems defined on different surfaces?
   - authalic or conformal mapping to the sphere?
+  - does CSAR even apply to ellipsoidal systems?
 - **extreme cells**
   - pentagons, cube corners
   - worst case or quantiles?
