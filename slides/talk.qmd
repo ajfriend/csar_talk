@@ -286,6 +286,20 @@ not a critique); one answer, convex, so unique, with a certificate;
 scale-free, a proportion, not a size.
 :::
 
+## {#countries menu-title="Countries"}
+
+<div class="globe-wrap"><canvas data-countries></canvas></div>
+
+::: {.notes}
+1 min, if time allows. The metric on shapes everyone knows. Hover a
+country, click it: the solver runs on its vertices and draws the ellipse.
+Chile reads about 6, France about 8 because French Guiana is part of the
+polygon, Indonesia about 4, the United States 1.5 with Alaska and Hawaii,
+Antarctica 1.4; Botswana is near 1. Every country solves, Russia and
+Antarctica included. Nothing here is DGGS-specific: the input is corner
+points on the sphere, whatever drew them.
+:::
+
 ## Finding the "smallest" ellipsoidal cone {.smaller}
 
 :::: {.r-hstack}

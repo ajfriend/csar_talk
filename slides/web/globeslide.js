@@ -31,10 +31,10 @@ import { solve as csarSolve } from 'https://cdn.jsdelivr.net/gh/ajfriend/csar_vi
 // Natural Earth coastlines, fetched once for all the globes. Resolved
 // through the import map so the offline profile serves the vendored copy.
 const NE = import.meta.resolve('https://cdn.jsdelivr.net/gh/nvkelso/natural-earth-vector@v5.1.2/geojson/ne_110m_coastline.geojson');
-const coast = fetch(NE).then(r => r.json()).then(geojsonLines).catch(() => null);
+export const coast = fetch(NE).then(r => r.json()).then(geojsonLines).catch(() => null);
 const TAU = 2 / 3;   // 1 - sigma_0^2: the cross-section's size on the plane b.x = 1
 const LOOK_AT = [10, 25];
-const MARK = '#c2620a';   // the hovered cell's marker and the solved ellipse
+export const MARK = '#c2620a';   // the hovered cell's marker and the solved ellipse
 
 // ---- colour. AR is cool: light to dark through the deck's teal and
 // purple (light = round, dark = stretched: a mostly-round globe reads as a
@@ -89,7 +89,7 @@ const solver = csarLoad().catch(() => null);
 // on the plane b.x = 1 the cross-section is the ellipse with semi-axes
 // sqrt(TAU)/sigma_1, sqrt(TAU)/sigma_2 along Q's columns 1 and 2 (the same
 // construction as the cone demo's rim); each point is then pushed to the sphere.
-function rim(r, n = 180) {
+export function rim(r, n = 180) {
   const q = j => [r.Q[j], r.Q[3 + j], r.Q[6 + j]];
   const b = q(0), f1 = q(1), f2 = q(2);
   const a1 = Math.sqrt(TAU) / r.sigma[1], a2 = Math.sqrt(TAU) / r.sigma[2];
