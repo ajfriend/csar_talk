@@ -23,6 +23,9 @@ canvas:focus { outline: none; }
 .pair { display: flex; gap: 2%; width: 100%; }
 .pair > div { flex: 1; min-width: 0; text-align: center; }
 .pair canvas.stage { height: 430px; }
+.pair.tall canvas.stage { height: 600px; }   /* a slide with no title row: the globe takes the height */
+/* a side-by-side row (reveal's r-hstack): breathing room between the columns */
+.reveal .r-hstack { gap: 1.5em; }
 .nums { font-family: ui-monospace, Menlo, monospace; font-size: 0.75em; margin: 0.2em 0 0 0; color: #333; }
 
 /* the point under, or beside, a comparison */
