@@ -14,6 +14,11 @@ SLIDES = Path(__file__).resolve().parent.parent / 'slides'
 FIGS = SLIDES / 'figs'
 DATA = SLIDES / 'data'
 
+# The dggs_compare data release every survey-derived figure and globe draws
+# on: one tag, so the globes and the trade-off plot agree.
+RELEASE = 'data-v11'
+RELEASE_URL = f'https://github.com/ajfriend/dggs_compare/releases/download/{RELEASE}/'
+
 # The deck's purple, and the ellipse's teal.
 FILL = '#c7c2ea'     # cell / shape fill
 EDGE = '#5b4fcf'     # cell / shape edge

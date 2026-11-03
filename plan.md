@@ -115,7 +115,7 @@ Interactive (web/ -> iframed):
   sets only.
 - C2 (optional). 2D playground for C(A, b), if the math slide needs it.
 
-## Example cells (found 2026-09-02, scripts/make_cell_examples.py)
+## Example cells (found 2026-09-02; the slides and their script were cut 2026-11-03)
 
 Enumerated every H3 cell at res 0-2 and every S2 cell at L0-3 with csar
 (dggs_compare's tables subsample above r0/L3). The coarsest resolution
@@ -143,7 +143,8 @@ Scope decisions, against the proposal (`../proposals/ar.md`):
   dggs_compare issue 90 (per-cell IPQ) stays open; not needed for the talk.
 - ~~Globes iframed from the live site.~~ Superseded: local ajglobe globes
   (see the decisions above).
-- **Survey figures are copied from dggs_compare/out** (histograms,
+- **The trade-off figure is computed from the release tables** (scripts/make_tradeoff.py);
+  the histogram figures were copied from dggs_compare/out (histograms,
   area_histograms, tradeoff). Four systems in the headline figures;
   IVEA7H and rHEALPix only on the site. Per-resolution plots cut: AR is
   resolution-stable, said in one sentence.

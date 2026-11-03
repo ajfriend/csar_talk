@@ -30,6 +30,10 @@ canvas:focus { outline: none; }
 
 /* the point under, or beside, a comparison */
 .point { font-size: 0.8em; margin-top: 0.6em; }
+/* the closing links: a label column and a link column, one link per line */
+.links dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.6em 1.2em; align-items: baseline; margin: 0; }
+.links dt { font-weight: 600; color: #555; text-align: right; }
+.links dd { margin: 0; }
 /* footnotes, citations, asides */
 .fine { font-size: 0.55em; color: #666; }
 

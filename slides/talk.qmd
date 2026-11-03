@@ -129,7 +129,7 @@ million, but every number on them is computed on the sphere.
 :::
 
 <!-- Four live slides: the shapes are drawn ON the sphere by the same
-     library as the cell slides (points + numbers from scripts/make_stretch.py
+     library as the demo slide (points + numbers from scripts/make_stretch.py
      via slides/data/shapes.js; captions filled in by web/cellslide.js).
      data-dist on the .pair: one camera distance for every shape, so a 1.5x
      stretch looks 1.5x wider. The whole sphere fits the canvas only for
@@ -286,100 +286,54 @@ not a critique); one answer, convex, so unique, with a certificate;
 scale-free, a proportion, not a size.
 :::
 
-## Tightest Enclosing Ellipsoidal Cone
+## Finding the "smallest" ellipsoidal cone {.smaller}
 
+:::: {.r-hstack}
+
+::: {style="width: 50%"}
 $$
 \begin{array}{ll}
 \underset{A,\, b}{\text{minimize}}
 & -\logdet A \\
 \text{subject to}
-& \norm{A x_i}_2 \le b^\top x_i, \quad i = 1, \ldots, n \\
+& \norm{A x_i}_2 \le b^\top x_i \\
 & \norm{b}_2 \le 1
 \end{array}
 $$
 
-with
-
-- data: $x_1, \ldots, x_n \in \R^3$ (on the sphere)
-- variables: $A \in \Sym^3_{++}$ and $b \in \R^3$
-
-::: {.notes}
-One slide of math, for the people who want it. The cone is the set of x
-with ||Ax|| <= b'x. Minimizing -log det A makes it as tight as possible.
-Everyone else: it is "smallest cone that fits".
+- data: $x_1, \ldots, x_n \in \R^3$, on the sphere
 :::
 
-# The same cells, measured
-
-## H3, resolution 2: a round cell
-
-```{=html}
-<canvas class="r-stretch stage" data-cell="h3-low"></canvas>
-```
-
-::: {.notes}
-2 min for the four cell slides: the ellipse from the demo, on real cells.
-This one is nearly a circle: AR 1.00.
+::: {style="width: 47%"}
+- **convex optimization** problem
+  - efficiently solvable
+  - no local optima to get stuck in
+  - duality certificates of optimality
+  - related to *minimum volume enclosing ellipsoid* (MVEE)
+- software
+  - `pip install csar`
+  - [github.com/ajfriend/csar_py](https://github.com/ajfriend/csar_py)
+  - [github.com/ajfriend/csar_zig](https://github.com/ajfriend/csar_zig)
 :::
 
-## H3, resolution 2: a stretched cell
-
-```{=html}
-<canvas class="r-stretch stage" data-cell="h3-high"></canvas>
-```
+::::
 
 ::: {.notes}
-Same system, same resolution, a different place on the globe: AR 1.23.
-About a quarter wider one way than the other.
-:::
+1.5 min. The cone is the set of x with ||Ax|| <= b'x; minimizing
+-log det A makes it as tight as possible. For the people who know the
+form: it is a convex problem, so any solution you find is the solution,
+and duality gives a provable bound; the solver reports a duality gap with
+every answer, so "optimal" is checked, not asserted. One spoken sentence
+if the room is technical: the problem statement is the spec and checking
+a solution is easy, which leaves the solution strategy free to change, a
+good regime for working with coding agents. Everyone else: "smallest cone
+that fits, and the computer can prove it found it".
 
-## S2, level 3: a round cell
-
-```{=html}
-<canvas class="r-stretch stage" data-cell="s2-low"></canvas>
-```
-
-::: {.notes}
-Cut this slide if short on time; the S2 squished cell carries the point.
-:::
-
-## S2, level 3: a stretched cell
-
-```{=html}
-<canvas class="r-stretch stage" data-cell="s2-high" data-edit></canvas>
-```
-
-::: {.notes}
-AR 1.55. A cube face corner. (This canvas is editable: drag a vertex and
-the ellipse follows, if the room wants to see it again.)
-:::
-
-# How it is solved
-
-## It is a convex problem
-
-- **No local optima.** Any solution you find is *the* solution.
-- **A certificate.** Duality gives a provable bound; the solver reports a duality gap with every answer, so "optimal" is checked, not asserted.
-- **Declarative.** The problem statement is the spec, and checking a solution is easy. That leaves the solution *strategy* free to change, which is a great regime for working with coding agents: they can try strategies, and the certificate tells you if they are right.
-
-::: {.notes}
-2 min for this section, 1 min on this slide. The agents point is one
-sentence out loud, not a tangent.
-:::
-
-## The software
-
-- `csar`: the solver, written in Zig, with a C ABI
-- `pip install csar`: wheels for CPython 3.11 to 3.14, Linux, macOS, Windows
-- Also compiled to **WebAssembly**: the demo you just saw was the real solver
-- Fast enough to survey **millions of cells** per run, each with a certificate
-- Open source, MIT
-
-<!-- TODO: one line with the native per-cell timing from csar_zig/bench -->
-
-::: {.notes}
-Point back at the demo. Microseconds per cell natively; the whole survey
-that follows is a few million solves.
+Software: the solver is written in Zig with a C ABI; pip installs wheels
+for CPython 3.11 to 3.14 on Linux, macOS, and Windows; the same solver
+compiled to WebAssembly ran the demo you just dragged. Fast enough that
+the survey that follows is a few million solves, each with a certificate.
+Open source, MIT.
 :::
 
 # Comparing grids
@@ -456,41 +410,40 @@ of the globe is fine, so the median is 1.18 and the extreme is in the
 tail. This is the case the "max or weighted?" open question is about.
 :::
 
-## Six systems, side by side
+## DGGS trade-off: shape vs. area
 
-| system | median AR | max AR | area, max ÷ min |
-|---|---:|---:|---:|
-| H3 | 1.06 | 1.22 | 1.80 |
-| S2 | 1.23 | 1.70 | 2.01 |
-| ISEA7H | 1.17 | 1.35 | 1.00 |
-| IVEA7H | 1.15 | 1.21 | 1.00 |
-| A5 | 2.13 | 2.31 | 1.00 |
-| rHEALPix | 1.18 | 2.38 | 1.00 |
+<!-- figure: scripts/make_tradeoff.py, computed from the survey tables at
+     the working resolutions listed beside it, the six systems of the globes -->
 
-::: {.fine}
-At matched cell size, about H3 resolution 9 (1 000 km² per cell). More systems and every resolution at [ajfriend.com/dggs_compare](https://ajfriend.com/dggs_compare/).
+:::: {.r-hstack}
+
+::: {style="width: 72%"}
+![](figs/tradeoff.png){width="100%"}
 :::
 
-::: {.notes}
-1 min. The globes in six rows. H3 and S2 trade area for shape; ISEA7H,
-IVEA7H, A5, and rHEALPix are exactly equal-area and pay in shape: ISEA7H
-a little, IVEA7H less (same grid, better projection), A5 a lot everywhere,
-rHEALPix a lot but only at the polar caps (median 1.18, max 2.38).
-Numbers are at the survey's working resolutions (H3 r9, S2 L15, ISEA7H
-r10, A5 r14), finer than the globes, and AR is resolution-stable, so they
-agree with what you just hovered.
+::: {.fine style="width: 24%"}
+resolutions
+
+- H3: 9
+- S2: 15
+- ISEA7H: 10
+- IVEA7H: 10
+- A5: 14
+- rHEALPix: 9
+
+exhaustive analysis: [ajfriend.com/dggs_compare](https://ajfriend.com/dggs_compare/)
 :::
 
-## Shape versus area, at matched resolution
-
-![](figs/tradeoff.png){height="560"}
+::::
 
 ::: {.notes}
-1.5 min, and this is the close. The one picture. The ideal grid is the
-star. Equal-area systems sit on the floor, but pay in shape: ISEA7H a
-little, A5 a lot (its cells are never round, AR about 2). H3 and S2 trade
-the other way: better shape, worse area. Nobody is at the star, and
-nobody can be: you cannot tile a sphere with identical round cells.
+1.5 min, and this is the close. The one picture: the six globes as six
+points. The ideal grid is the star. The equal-area systems sit on the
+floor and pay in shape, from ISEA7H's little to A5's and rHEALPix's
+about 2.4 (rHEALPix only at the polar caps, median 1.18: the "max or
+weighted?" open question). H3 and S2 trade the other way: better shape,
+worse area. Nobody is at the star, and nobody can be: you cannot tile a
+sphere with identical round cells.
 
 The message, spoken, not on a slide: equal area is a fine goal, and it is
 one goal. Shape, hierarchy, indexing, neighbours, ease of implementation.
@@ -499,19 +452,14 @@ and now it is cheap and exact to measure. Use it to see the trade-off you
 are already making.
 :::
 
-# Open questions
+## Open questions
 
-## Work in progress
-
-- **sphere vs. ellipsoid**: which sphere is fair? does 0.2% matter?
-- **extreme cells**: pentagons, cube corners. max? or weighted?
-- **matching resolutions**: equal count? equal mean area?
-- **sampling**: every cell, or points? points are size-biased
-- **direction**: AR has an axis. kernels feel the field
-
-<br>
-
-All the data: [ajfriend.com/dggs_compare](https://ajfriend.com/dggs_compare/)
+- **sphere vs. ellipsoid**
+  - how to fairly compare systems defined on different surfaces?
+  - authalic or conformal mapping to the sphere?
+- **extreme cells**
+  - pentagons, cube corners
+  - worst case or quantiles?
 
 ::: {.notes}
 1 min. This is a work in progress and these are the questions I'd like
@@ -522,18 +470,32 @@ that's what the survey uses, but it is a choice. Extreme cells: H3 and
 ISEA have 12 pentagons, S2 has 8 cube corners, rHEALPix has polar caps;
 dggs_compare reports median, p99.95, and max side by side so you can see
 both the typical cell and the worst one. Resolution matching: the survey
-matches mean cell area (H3 r9, S2 L15, A5 r14, ISEA7H r10). Sampling:
+matches mean cell area (the resolutions on the trade-off slide). Sampling:
 coarse levels are enumerated in full, fine ones are 1M point-drawn cells,
 which are size-biased unless weighted by 1/area, and the published plots
 are. Direction: the enclosing cone gives the axis for free; the AR globes
 show magnitude only. All of it is on the site, with the data as Parquet.
 :::
 
-## Thanks
+## Questions?
 
-- `pip install csar` · [github.com/ajfriend/csar_py](https://github.com/ajfriend/csar_py)
-- Solver: [github.com/ajfriend/csar_zig](https://github.com/ajfriend/csar_zig)
-- Survey and globes: [ajfriend.com/dggs_compare](https://ajfriend.com/dggs_compare/)
-- The demo: [ajfriend.com/csar_viz](https://ajfriend.com/csar_viz/)
-- Paper in preparation
-- These slides: [ajfriend.com/csar_talk](https://ajfriend.com/csar_talk/)
+:::: {.r-hstack style="margin-top: 3em"}
+
+::: {.links style="width: 60%"}
+code
+:   [github.com/ajfriend/csar_py](https://github.com/ajfriend/csar_py)<br>
+    [github.com/ajfriend/csar_zig](https://github.com/ajfriend/csar_zig)
+
+viz
+:   [ajfriend.com/dggs_compare](https://ajfriend.com/dggs_compare/)<br>
+    [ajfriend.com/csar_viz](https://ajfriend.com/csar_viz/)
+
+slides
+:   [ajfriend.com/csar_talk](https://ajfriend.com/csar_talk/)
+:::
+
+::: {.point style="width: 36%"}
+Thanks to Kevin Sahr and Ben Griffin for helpful discussions.
+:::
+
+::::

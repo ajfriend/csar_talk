@@ -1,6 +1,6 @@
 // Mounts every <canvas data-cell="…"> in the deck with that point set from
-// data/cells.js (scripts/make_cell_examples.py) or data/shapes.js
-// (scripts/make_stretch.py), looked at straight down the cone's axis. Also
+// data/shapes.js (scripts/make_stretch.py), looked at straight down the
+// cone's axis. Also
 // the deck's one import of teec.js, so the cone slide takes `mount` from
 // here. Pinned to a csar_viz tag via jsDelivr (correct content types + CORS
 // for the module and the wasm), so the slides don't change when the demo
@@ -20,10 +20,9 @@
 //                         it is authored, so scroll-zoom is off
 // Canvases on one slide share a camera: spin either and both turn.
 import { mount } from 'https://cdn.jsdelivr.net/gh/ajfriend/csar_viz@v0.1.5/teec.js';
-import { cells } from '../data/cells.js';
 import { shapes } from '../data/shapes.js';
 
-const sets = { ...cells, ...shapes };
+const sets = shapes;
 const TOGGLES = ['cone', 'rim', 'axis', 'hull', 'outline', 'points'];
 const showSpec = list =>
   Object.fromEntries(TOGGLES.map(k => [k, list.split(',').includes(k)]));

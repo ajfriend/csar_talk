@@ -16,10 +16,9 @@ import json
 
 import numpy as np
 
-from _fig import DATA, fetch
+from _fig import DATA, RELEASE_URL, fetch
 
-RELEASE = 'data-v11'
-URL = f'https://github.com/ajfriend/dggs_compare/releases/download/{RELEASE}/globe--{{key}}_{{part}}'
+URL = RELEASE_URL + 'globe--{key}_{part}'
 OUT = DATA / 'globe'
 PARTS = ['pos.f32', 'idx.u32', 'ar.f32', 'area.f32']
 
